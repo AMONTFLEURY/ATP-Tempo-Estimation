@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="uv (ATP-Tempo-Estimation)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="uv (ATP-Tempo-Estimation)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9" project-jdk-type="Python SDK" />
 </project>

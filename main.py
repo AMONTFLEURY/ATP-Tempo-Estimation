@@ -1,16 +1,19 @@
-# This is a sample Python script.
+import librosa
+import librosa.display
+import os
+import math
+import soundfile
+import audioread
+# import Audio
+import numpy as np
+import matplotlib.pyplot as plt
+import array as arr
+import time
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import SystemManager
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+pathList = (SystemManager.pullPaths())
+SystemManager.getCPUcount()
+CPU_list = SystemManager.splitPathList(fullList=pathList, jobs= 4)
+for jobs in CPU_list:
+    print(jobs)

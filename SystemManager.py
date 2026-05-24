@@ -9,7 +9,10 @@ def pullPaths():
     for files in fileScanner:
         fileName = files
         songPaths.append("Music/" + (fileName.__str__())[11:-2])
-        print((fileName.__str__())[11:-2])
+        songName = ((fileName.__str__())[11:-2])
+        songName = songName.replace(" (SPOTISAVER)", "")
+        songName = songName.replace(".mp3", "")
+        print(songName)
     return songPaths
 
 

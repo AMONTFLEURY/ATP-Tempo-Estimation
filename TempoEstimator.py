@@ -16,10 +16,10 @@ def getTempo(mp3Path):
 
 def getRawTempo(mp3Path):
     y, sr = librosa.load(mp3Path, sr=None, mono=True, offset=15, duration=120)
-    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * .5, trim=False)
-    print("Tempo", tempo)
-
-    onset_env = librosa.onset.onset_strength(y=y, sr=sr)
-    pulse = librosa.beat.plp(onset_envelope=onset_env, sr=sr, tempo_max=tempo + 20, tempo_min=tempo - 20)
-    tempo, beats = librosa.beat.beat_track(onset_envelope=pulse, sr=sr, trim=False)
-    return round(tempo[0])
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr *2, trim=False)
+    print(round(tempo[0],4))
+    #
+    # onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+    # pulse = librosa.beat.plp(onset_envelope=onset_env, sr=sr, tempo_max=tempo + 20, tempo_min=tempo - 20)
+    # tempo, beats = librosa.beat.beat_track(onset_envelope=pulse, sr=sr, trim=False)
+    return round(tempo[0],4)

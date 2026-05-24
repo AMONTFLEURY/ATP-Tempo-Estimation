@@ -1,21 +1,35 @@
 import os
 import multiprocessing
 
-songPaths = []
+from numpy.ma.extras import average
 
 
 def pullPaths():
+    songPaths = []
+    songNames = []
     fileScanner = os.scandir("Music")
     for files in fileScanner:
         fileName = files
         songPaths.append("Music/" + (fileName.__str__())[11:-2])
-        print((fileName.__str__())[11:-2])
-    return songPaths
+        songName = ((fileName.__str__())[11:-2])
+        songName = songName.replace(" (SPOTISAVER)", "")
+        songName = songName.replace(".mp3", "")
+        songNames.append(songName)
+        print(songName)
+    return songPaths, songNames
 
 
 def getCPUcount():
     return os.cpu_count()
 
+
+def get_average_deviation(vector):
+    x =[]
+    total = 0
+    for i in range(len(vector)-1):
+        total += (vector[i] -  vector[i+1])
+        x.append(total)
+    return average(x)
 
 def splitPathList(fullList, jobs=-1):
     list_of_lists = []

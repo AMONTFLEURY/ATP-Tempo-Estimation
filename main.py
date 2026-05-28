@@ -1,40 +1,24 @@
 from numpy.ma.core import floor
 from numpy.ma.extras import average
-
+import time
 import SystemManager
-import multiprocessing
-
+from multiprocessing import Pool
+import librosa
 import TempoEstimator
 import TempoGetter
 
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
-CPU_list = SystemManager.splitPathList(fullList=pathList, jobs= 4)
+CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
 # for jobs in CPU_list:
 #     print(jobs)
 tempoList = []
-def getTempos(Cpu_list):
 
-    for job in range(len(Cpu_list[3])):
-        try:
-            process_0 = multiprocessing.Process(target= TempoGetter.getRawTempo(Cpu_list[0][job]))
-            process_1 = multiprocessing.Process(target= TempoGetter.getRawTempo(Cpu_list[1][job]))
-            process_2 = multiprocessing.Process(target= TempoGetter.getRawTempo(Cpu_list[2][job]))
-            process_3 = multiprocessing.Process(target= TempoGetter.getRawTempo(Cpu_list[3][job]))
 
-            process_0.start()
-            process_1.start()
-            process_2.start()
-            process_3.start()
 
-            process_0.join()
-            process_1.join()
-            process_2.join()
-            process_3.join()
-        except:
-            pass
 
 if __name__ == "__main__":
+    start = time.time()
     # print(TempoGetter.getRawTempo(CPU_list[1][1]))
     # for song in pathList:
     #     (TempoGetter.getRawTempo(song, 1))
@@ -48,6 +32,41 @@ if __name__ == "__main__":
     # for song in pathList:
     #     print(TempoEstimator.get_tempo_from_onset(song, sr_multiplier=1))
 
-    for song in pathList:
-        tempo = TempoGetter.getRawTempo(song, srm= 0.5)
-        print(TempoGetter.estimate_Tempo_From_Tempo(song, tempo= floor(tempo), sr_multiplier=1))
+    # for song in pathList:
+    #     tempo = TempoGetter.getRawTempo(song, srm=0.5)
+    #     print(TempoGetter.estimate_Tempo_From_Tempo(song, tempo=floor(tempo), sr_multiplier=1))
+    #
+    # print(TempoGetter.get_Dtempo_from_onset(pathList[20], sr_multiplier=1))
+
+
+    # i = 90
+    # timeSer, sr = librosa.load(pathList[i], sr=None, mono=True)
+    #
+    # print(songList[i])
+    # tempo = (TempoGetter.getRawTempo(pathList[i], 2))
+    # print(tempo)
+    # print(librosa.feature.tempo(y=timeSer, sr=sr))
+    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=2, onset=True, starting_tempo=tempo, interval=200)
+    # # print(len(y))
+    # print("average deviation", SystemManager.get_average_deviation(y))
+    # print(x)
+    # print("------------------------------------------")
+    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=2, onset=False, starting_tempo=tempo, interval=200)
+    # # print(len(y))
+    # print("average deviation", SystemManager.get_average_deviation(y))
+    # print(x)
+    # print("------------------------------------------")
+    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=.5, onset=False, starting_tempo=92, interval=50)
+    # # print(len(y))
+    # print("average deviation", SystemManager.get_average_deviation(y))
+    # print(x)
+    # print("------------------------------------------")
+    # print(librosa.get_duration(y=timeSer, sr=sr))
+    # print(librosa.get_samplerate(pathList[i]))
+    # print(TempoEstimator.estimate(pathList[0]))
+    with Pool(6) as p:
+        for result in p.imap(TempoEstimator.estimate, pathList):
+            print(result)
+
+    end = time.time()
+    print(f"Time elapsed: {end - start} seconds")

@@ -1,6 +1,7 @@
 import os
 import multiprocessing
-
+import pandas as pd
+import statistics as stats
 from numpy.ma.extras import average
 
 
@@ -15,7 +16,7 @@ def pullPaths():
         songName = songName.replace(" (SPOTISAVER)", "")
         songName = songName.replace(".mp3", "")
         songNames.append(songName)
-        print(songName)
+        # print(songName)
     return songPaths, songNames
 
 
@@ -24,12 +25,12 @@ def getCPUcount():
 
 
 def get_average_deviation(vector):
-    x =[]
     total = 0
-    for i in range(len(vector)-1):
-        total += (vector[i] -  vector[i+1])
-        x.append(total)
-    return average(x)
+    avg = average(vector)
+    for num in vector:
+        total += round(abs(num - avg), 4)
+    return total / len(vector)
+
 
 def splitPathList(fullList, jobs=-1):
     list_of_lists = []
@@ -47,3 +48,15 @@ def splitPathList(fullList, jobs=-1):
     for i in range(len(fullList)):
         list_of_lists[i % cpus].append(fullList[i])
     return list_of_lists
+
+
+def compareDynamicTempos(arr1, arr2):
+    num = []
+    for i in range(len(arr1)):
+        if arr1[i] == arr2[i]:
+            num.append(arr1[i])
+    if len(num) == 0:
+        return 0, 0
+    else:
+        x = stats.mode(num)
+        return x, num.count(x)

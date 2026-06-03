@@ -64,9 +64,10 @@ if __name__ == "__main__":
     # print(librosa.get_duration(y=timeSer, sr=sr))
     # print(librosa.get_samplerate(pathList[i]))
     # print(TempoEstimator.estimate(pathList[0]))
-    with Pool(6) as p:
-        for result in p.imap(TempoEstimator.estimate, pathList):
-            print(result)
-
+    # with Pool(6) as p:
+    #     for result in p.imap(TempoEstimator.estimate, pathList):
+    #         print(result)
+    # print(TempoEstimator.estimate(pathList))
+    print(TempoEstimator.estimate(pathList[33]))
     end = time.time()
     print(f"Time elapsed: {end - start} seconds")

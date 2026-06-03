@@ -12,15 +12,18 @@ def estimate(path, threading=False):
         return estimate_single_track(path)
         # print("String arg")
     elif type(path).__name__ == "list":
-        list_with_MP(path)
         if type(path[0]).__name__ == "list":
             print("List of list arg")
+        else:
+            with Pool(6) as p:
+                for result in p.imap(estimate_single_track, path):
+                    print(result)
 
 
 def list_with_MP(list_of_paths=None):
-    # list_of_list = SystemManager.splitPathList(list_of_paths)
-    # with Pool(2) as p:
-    #     (p.map(estimate_single_track, list_of_paths))
+    list_of_list = SystemManager.splitPathList(list_of_paths)
+    with Pool(2) as p:
+        (p.map(estimate_single_track, list_of_paths))
     pass
 
 

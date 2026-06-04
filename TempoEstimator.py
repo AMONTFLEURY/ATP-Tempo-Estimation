@@ -1,6 +1,8 @@
+import multiprocessing
+
 import librosa
 import TempoGetter
-from multiprocessing import Pool
+import multiprocessing as mp
 import SystemManager
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -10,7 +12,7 @@ def estimate(path, threading=False):
     if type(path).__name__ == "str":
         # load track, 1
         return estimate_single_track(path)
-        # print("String arg")
+        print("String arg")
     elif type(path).__name__ == "list":
         list_with_MP(path)
         if type(path[0]).__name__ == "list":
@@ -31,20 +33,41 @@ def list_no_MP(path):
 def estimate_single_track(path):
     y, sr = librosa.load(path, sr=None, mono=True, duration=120, offset=30)
     tempo0 = TempoGetter.getRawTempo(y=y, sr=sr, srm=0.5)
+
     dynam_tempo_array0, all_dTypos0 = TempoGetter.get_Dtempo(path, sr_multiplier=2,
                                                              onset=True, starting_tempo=tempo0, interval=200)
     avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
+
     dynam_tempo_array1, all_dTypos1 = TempoGetter.get_Dtempo(path, sr_multiplier=2,
                                                              onset=False, starting_tempo=tempo0, interval=200)
     avg_dev1 = SystemManager.get_average_deviation(dynam_tempo_array1)
+
+
     dummyTempo = getDummyTempo(round(tempo0))
     mode, mode_count = SystemManager.compareDynamicTempos(dynam_tempo_array0, dynam_tempo_array1)
     print(path)
     print(mode_count / len(dynam_tempo_array1))
-    if avg_dev0 <= 0.1 and avg_dev1 <= 0.1 and 0.70 <= (mode_count / len(dynam_tempo_array0)):
+
+    # Test 1,
+    if avg_dev0 <= 0.1 and avg_dev1 <= 0.1 and 0.60 <= (mode_count / len(dynam_tempo_array0)):
         return mode
-    else:
-        return "Failed Test for " + path
+    # if avg_dev0 <= 0.05:
+    #     return mode
+    # if avg_dev1 <= 0.5:
+    #     return mode
+
+    # Test 2,
+    tempo_from_tempo1 = TempoGetter.estimate_Tempo_From_Tempo(tempo= mode,sr=sr, time_series= y)
+    tempo_from_tempo2 = TempoGetter.estimate_Tempo_From_Tempo(tempo= tempo0, sr=sr, time_series= y)
+    pot_tempo =[]
+    pot_tempo.append(dynam_tempo_array0.count(tempo_from_tempo1))
+    pot_tempo.append(dynam_tempo_array0.count(tempo_from_tempo2))
+    pot_tempo.append(dynam_tempo_array1.count(tempo_from_tempo1))
+    pot_tempo.append(dynam_tempo_array1.count(tempo_from_tempo2))
+
+    get_lowest_deviation(round(tempo0), 10, path)
+
+    return None
 
 
 def getDummyTempo(tempo):
@@ -52,3 +75,13 @@ def getDummyTempo(tempo):
         return tempo / 2
     elif tempo <= 80:
         return tempo * 2
+    return tempo
+
+def get_lowest_deviation(tempo, range_interval, path):
+    dynam_tempo_array = []
+    for i in range((tempo - range_interval), (tempo + range_interval)):
+        x, y = TempoGetter.get_Dtempo(path, sr_multiplier=2,onset=True, starting_tempo= i, interval=200)
+        avg_dev0 = SystemManager.get_average_deviation(x)
+        dynam_tempo_array.append([avg_dev0,i,x])
+    return dynam_tempo_array
+

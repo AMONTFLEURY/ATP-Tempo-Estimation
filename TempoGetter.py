@@ -3,11 +3,16 @@ import librosa
 import SystemManager
 
 
-def estimate_Tempo_From_Tempo(mp3Path, tempo, sr_multiplier=1.0):
-    y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=61, offset=30)
-    tempo, beatFrames = librosa.beat.beat_track(y=y, sr=sr * sr_multiplier, start_bpm=tempo / 2)
-    return round(tempo[0])
-    pass
+def estimate_Tempo_From_Tempo(mp3Path = None, tempo = 120, sr_multiplier=1.0, time_series = None, sr = None):
+    if time_series is None:
+        y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=61, offset=30)
+        tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr * sr_multiplier, start_bpm=tempo / 2)
+        return round(tempo[0])
+    else:
+        print("process started")
+        tempo, beat_frame = librosa.beat.beat_track(y=time_series, sr=sr * sr_multiplier)
+        return round(tempo[0])
+
 
 
 def getTempo(mp3Path):
@@ -48,7 +53,7 @@ def get_Dtempo_from_onset(mp3Path, sr_multiplier=1.0):
     return dynamicTempoArray, dtempo
 
 
-def get_Dtempo(mp3Path, onset=False, sr_multiplier=1.0, interval=700, y=[], sr=0, starting_tempo=120):
+def get_Dtempo(mp3Path, onset=False, sr_multiplier=1.0, interval=400, y=[], sr=0, starting_tempo=120):
     dynamicTempoArray = []
     if y == []:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)

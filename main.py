@@ -14,8 +14,10 @@ CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
 #     print(jobs)
 tempoList = []
 
-
-
+def getBeatTimeSpacing(path):
+    y, sr = librosa.load(path)
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+    beat_team = librosa.frames_to_time(beats, sr=sr)
 
 if __name__ == "__main__":
     start = time.time()
@@ -37,7 +39,6 @@ if __name__ == "__main__":
     #     print(TempoGetter.estimate_Tempo_From_Tempo(song, tempo=floor(tempo), sr_multiplier=1))
     #
     # print(TempoGetter.get_Dtempo_from_onset(pathList[20], sr_multiplier=1))
-
 
     # i = 90
     # timeSer, sr = librosa.load(pathList[i], sr=None, mono=True)
@@ -68,6 +69,31 @@ if __name__ == "__main__":
     #     for result in p.imap(TempoEstimator.estimate, pathList):
     #         print(result)
     # print(TempoEstimator.estimate(pathList))
-    print(TempoEstimator.estimate(pathList[33]))
+    j = 91
+    print(pathList[j])
+    for i in range(30, 240, 5):
+        DynamicTempoMode, ModeFrequency, ArrayLength, AverageDeviation = TempoEstimator.getTempoFromDynamTempoArray(pathList[j],tempo=i)
+        print(DynamicTempoMode)
+    print("---------------------------------------------")
+    for i in range(30, 240, 5):
+        DynamicTempoMode, ModeFrequency, ArrayLength, AverageDeviation = TempoEstimator.getTempoFromDynamTempoArray(
+            pathList[j], tempo=i)
+        print(AverageDeviation)
+    # y, sr = librosa.load(pathList[j])
+    # tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+    # beat_team = librosa.frames_to_time(beats, sr=sr)
+    # print(beat_team)
+    # temp = 139
+    # print(beat_team[temp] - beat_team[0])
+    # print(beat_team[temp * 3] - beat_team[temp * 2])
+    # print(beat_team[temp * 4] - beat_team[temp * 3])
+
+
+    # print(tempo)
+
+    # print(SystemManager.findFirstBeat())
+
     end = time.time()
     print(f"Time elapsed: {end - start} seconds")
+
+

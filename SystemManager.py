@@ -60,3 +60,6 @@ def compareDynamicTempos(arr1, arr2):
     else:
         x = stats.mode(num)
         return x, num.count(x)
+
+def findFirstBeat(time_series, currentbeat):
+    pass

@@ -4,6 +4,7 @@ from multiprocessing import Pool
 import SystemManager
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+import statistics
 
 
 def estimate(path, threading=False):
@@ -55,3 +56,11 @@ def getDummyTempo(tempo):
         return tempo / 2
     elif tempo <= 80:
         return tempo * 2
+
+
+def getTempoFromDynamTempoArray(path, tempo=120):
+    dynam_tempo_array0, all_dTypos0 = TempoGetter.get_Dtempo(mp3Path=path, onset=False, sr_multiplier= 0.5, starting_tempo=tempo, interval= 200)
+    avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
+    mode, mode_count = SystemManager.compareDynamicTempos(dynam_tempo_array0, dynam_tempo_array0)
+
+    return mode, mode_count, len(dynam_tempo_array0), round(float(avg_dev0),4)

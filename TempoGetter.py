@@ -48,7 +48,7 @@ def get_Dtempo_from_onset(mp3Path, sr_multiplier=1.0):
     return dynamicTempoArray, dtempo
 
 
-def get_Dtempo(mp3Path, onset=False, sr_multiplier=1.0, interval=700, y=[], sr=0, starting_tempo=120):
+def get_Dtempo(mp3Path, onset=False, sr_multiplier=1.0, interval=300, y=[], sr=0, starting_tempo=120):
     dynamicTempoArray = []
     if y == []:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)

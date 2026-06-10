@@ -48,7 +48,7 @@ def estimate_single_track(path):
     if avg_dev0 <= 0.1 and avg_dev1 <= 0.1 and 0.70 <= (mode_count / len(dynam_tempo_array0)):
         return mode
     else:
-        return "Failed Test for " + path
+        return -1
 
 
 def getDummyTempo(tempo):
@@ -68,8 +68,8 @@ def getTempoFromDynamTempoArray(path, tempo=120, onset=False, sr=1):
 
 def DynamicTempoAlgo(path):
     holder, tempo1, tempo2, tempo3 = DTA_Getter(path)
-
-    return DTA_Analyzer(holder, tempo1, tempo2, tempo3, path)
+    estimated = DTA_Analyzer(holder, tempo1, tempo2, tempo3, path)
+    return estimated
 
 
 def DTA_Getter(path):
@@ -83,7 +83,7 @@ def DTA_Getter(path):
     tempo1, tempo2, tempo3 = 0, 0, 1
 
     # intailizing the holder array for the while loop to work
-    dynam_tempo_array0, all_dTypos0 = TempoGetter.get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False, sr_multiplier=0.5,
+    dynam_tempo_array0, all_dTypos0 = TempoGetter.get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False, sr_multiplier=1,
                                                              starting_tempo=starting_tempo, interval=200)
     # Gets average deviation
     avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
@@ -145,9 +145,6 @@ def DTA_Analyzer(holder, tempo1, tempo2, tempo3, path):
         elif (holder[tempo2][1] + 1) % (holder[tempo1][1] + 1) == 0:
             estimated_tempo = holder[tempo2][1] + 1
 
-        if holder[tempo2][1] > 140 or True:
-            estimated_tempo = checkBeatTiming(path, estimated_tempo, holder[tempo2][1])
-
         if estimated_tempo < 0:
             if onset_tempo - 0.7 < holder[tempo2][1] < onset_tempo + 0.7:
                 return holder[tempo2][1]
@@ -199,7 +196,7 @@ def checkBeatTiming(path, estimated_tempo, tempo2):
     beats = librosa.frames_to_time(beats, sr=sr)
     estimated_tempo += 2
     x = (beats[estimated_tempo] - beats[0])
-    x2 = (beats[estimated_tempo /2] - beats[estimated_tempo])
+    x2 = (beats[estimated_tempo / 2] - beats[estimated_tempo])
     print(x, x2)
 
     while x > 60 and x2 > 30:
@@ -208,3 +205,29 @@ def checkBeatTiming(path, estimated_tempo, tempo2):
         x2 = (beats[estimated_tempo * 2] - beats[estimated_tempo])
     print(x, x2)
     return estimated_tempo + 1
+
+
+# def addToGrid(arg, i):
+#     base[i].append(arg)
+
+
+def comparer(base):
+    pass
+
+
+def combinedAlgo(path_list):
+    base = []
+    for i in range(len(path_list)):
+        base.append([])
+    # for path in path_list:
+    #     base.append([path])
+    for i in range(len(path_list)):
+        base[i].append(TempoGetter.getRawTempo(path_list[i], srm=0.5))
+        base[i].append(TempoGetter.getRawTempo(path_list[i]))
+        base[i].append(TempoGetter.get_tempo_from_onset(path_list[i],))
+    for i in range(len(path_list)):
+        base[i].append(DynamicTempoAlgo(path_list[i]))
+    for i in range(len(path_list)):
+        estimate_single_track(path_list[i])
+    for i in range(len(path_list)):
+        TempoGetter.get_onsets(path_list[i], startBPM=base[i])

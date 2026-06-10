@@ -14,10 +14,12 @@ CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
 #     print(jobs)
 tempoList = []
 
+
 def getBeatTimeSpacing(path):
     y, sr = librosa.load(path)
     tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
     beat_team = librosa.frames_to_time(beats, sr=sr)
+
 
 if __name__ == "__main__":
     start = time.time()
@@ -65,21 +67,16 @@ if __name__ == "__main__":
     # print(librosa.get_duration(y=timeSer, sr=sr))
     # print(librosa.get_samplerate(pathList[i]))
     # print(TempoEstimator.estimate(pathList[0]))
-    # with Pool(6) as p:
-    #     for result in p.imap(TempoEstimator.estimate, pathList):
+    # with Pool(8) as p:
+    #     for result in p.imap(TempoEstimator.DynamicTempoAlgo, pathList):
     #         print(result)
-    # print(TempoEstimator.estimate(pathList))
-    j = 91
-    print(pathList[j])
-    for i in range(30, 240, 5):
-        DynamicTempoMode, ModeFrequency, ArrayLength, AverageDeviation = TempoEstimator.getTempoFromDynamTempoArray(pathList[j],tempo=i)
-        print(DynamicTempoMode)
-    print("---------------------------------------------")
-    for i in range(30, 240, 5):
-        DynamicTempoMode, ModeFrequency, ArrayLength, AverageDeviation = TempoEstimator.getTempoFromDynamTempoArray(
-            pathList[j], tempo=i)
-        print(AverageDeviation)
+
+    # TempoGetter.get_Dtempo(mp3Path=pathList[j])
     # y, sr = librosa.load(pathList[j])
+
+    # for i in range(30, 240, 5):
+    #     print(i, TempoEstimator.getTempoFromDynamTempoArray(pathList[j], tempo=i))
+
     # tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
     # beat_team = librosa.frames_to_time(beats, sr=sr)
     # print(beat_team)
@@ -88,12 +85,21 @@ if __name__ == "__main__":
     # print(beat_team[temp * 3] - beat_team[temp * 2])
     # print(beat_team[temp * 4] - beat_team[temp * 3])
 
-
     # print(tempo)
 
     # print(SystemManager.findFirstBeat())
-
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[j]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[52]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[47]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[38]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[125]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[126]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[20]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[108]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[89]))
+    # print(TempoEstimator.DynamicTempoAlgo(pathList[91]))
+    for i in range(100, len(pathList)):
+        print(pathList[i])
+        print(TempoEstimator.DynamicTempoAlgo(pathList[i]))
     end = time.time()
     print(f"Time elapsed: {end - start} seconds")
-
-

@@ -1,10 +1,16 @@
+import multiprocessing
+
 import librosa
+from numba.cuda.libdeviceimpl import args
+
 import TempoGetter
-from multiprocessing import Pool
+from multiprocessing import Pool, Queue
 import SystemManager
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import statistics as stats
+
+from TempoGetter import getRawTempo
 
 
 def estimate(path, threading=False):
@@ -66,19 +72,20 @@ def getTempoFromDynamTempoArray(path, tempo=120, onset=False, sr=1):
     return mode, round(float(avg_dev0), 4)
 
 
-def DynamicTempoAlgo(path):
-    holder, tempo1, tempo2, tempo3 = DTA_Getter(path)
-    estimated = DTA_Analyzer(holder, tempo1, tempo2, tempo3, path)
+def DynamicTempoAlgo(path = "", y = None, sr = None):
+    holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y=y, sr=sr)
+    estimated = DTA_Analyzer(holder, tempo1, tempo2, tempo3, path, y=y, sr=sr)
     return estimated
 
 
-def DTA_Getter(path):
+def DTA_Getter(path = "", y =None, sr = None):
     # print(path)
-    y, sr = librosa.load(path, mono=True, sr=None)
+    if path != "":
+        y, sr = librosa.load(path, mono=True, sr=None)
 
     # each cell of the holder includes [Initial/Starting Tempo, Mode, Average Deviation]
     holder = []
-    starting_tempo = 55
+    starting_tempo = 40
     increment = 5
     tempo1, tempo2, tempo3 = 0, 0, 1
 
@@ -117,8 +124,8 @@ def DTA_Getter(path):
     return holder, tempo1, tempo2, tempo3
 
 
-def DTA_Analyzer(holder, tempo1, tempo2, tempo3, path):
-    onset_tempo = TempoGetter.get_tempo_from_onset(path, sr_multiplier=1)
+def DTA_Analyzer(holder, tempo1, tempo2, tempo3, path, y=None, sr=None):
+    onset_tempo = TempoGetter.get_tempo_from_onset(path, sr_multiplier=1, y=y, sr=sr)
     estimated_tempo = -2
     if holder[tempo2][1] % holder[tempo1][1] == 0 and (holder[tempo2][2] < 0.85 or holder[tempo2 - 1][2] < 0.85):
         estimated_tempo = holder[tempo2][1]
@@ -149,9 +156,8 @@ def DTA_Analyzer(holder, tempo1, tempo2, tempo3, path):
             if onset_tempo - 0.7 < holder[tempo2][1] < onset_tempo + 0.7:
                 return holder[tempo2][1]
             else:
-                y, sr = librosa.load(path)
+                # y, sr = librosa.load(path)
                 tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 2, start_bpm=holder[tempo2][1])
-                beats = librosa.frames_to_time(beats, sr=sr)
                 tempo = round(tempo[0])
 
                 if tempo - 0.7 < holder[tempo2][1] < tempo + 0.7 or tempo - 0.7 < (holder[tempo2][1] / 2) < tempo + 0.7:
@@ -170,7 +176,7 @@ def DTA_Analyzer(holder, tempo1, tempo2, tempo3, path):
             if onset_tempo - 0.5 < (holder[tempo1][1] * 2) < onset_tempo + 0.5:
                 mode, ave_de = getTempoFromDynamTempoArray(path, tempo=holder[tempo1][1] * 2)
                 if ave_de < 0.2 or mode % holder[tempo1][1] == 0:
-                    y, sr = librosa.load(path)
+                    # y, sr = librosa.load(path)
                     tempo, beats = librosa.beat.beat_track(y=y, sr=sr, start_bpm=holder[tempo2][1])
                     if tempo - 0.7 < holder[tempo2][1] < tempo + 0.7 or tempo - 0.7 < (
                             holder[tempo2][1] / 2) < tempo + 0.7:
@@ -211,8 +217,92 @@ def checkBeatTiming(path, estimated_tempo, tempo2):
 #     base[i].append(arg)
 
 
-def comparer(base):
-    pass
+def crossChecker(array, dummy, weight = 2):
+    weight = -weight
+    if array[3] < 0:
+        if dummy[0] == array[0]:
+            weight+=1
+        if dummy[1] == array[1]:
+            weight+=1
+        if dummy[2] == array[2]:
+            weight+=2
+    if weight >= 0:
+        return dummy[3]
+    else:
+        return array[3]
+
+
+def DTA_checker(array, y, sr):
+    if array[3] < 0:
+        tempo = TempoGetter.estimate_Tempo_From_Tempo(y=y, sr=sr, tempo=array[0])
+        x1, x2 = TempoGetter.getBeatTime(y=y, sr=sr)
+        if x1 > 60 and x2 > 60:
+            tempo+=1
+        elif x1 < 60 and x2 > 60:
+            tempo-=1
+        return tempo
+    else:
+        return -9
+
+def process_1(y, sr, path ="", q= None):
+    q.put(TempoGetter.getRawTempo( mp3Path=path, y= y, sr=sr * 0.5))
+
+def process_2(y, sr, path ="", q= None):
+    q.put(TempoGetter.getRawTempo(mp3Path=path, y= y, sr=sr))
+
+def process_3(y, sr, path ="", q= None):
+    q.put(TempoGetter.get_tempo_from_onset(mp3Path="", y=y, sr=sr))
+
+def process_4(y, sr, path ="", q= None):
+    q.put(DynamicTempoAlgo(path, y, sr))
+
+def process_5(y, sr, path ="", q= None):
+    holder, tempo1, tempo2, tempo3 = DTA_Getter(path,y, sr)
+    q.put([holder[tempo1][1], holder[tempo2][1]])
+
+def getTempoVectorMP(path):
+
+    y, sr = librosa.load(path, sr=None, mono=True)
+    q = Queue()
+    p1 = multiprocessing.Process(target=process_1, args=(y, sr, path, q))
+    p2 = multiprocessing.Process(target=process_2, args=(y, sr, path, q))
+    p3 = multiprocessing.Process(target=process_3, args=(y, sr, path, q))
+    # p4 = multiprocessing.Process(target=process_4, args=(y, sr, path, q))
+    p5 = multiprocessing.Process(target=process_5, args=(y, sr, path, q))
+
+    p1.start()
+    p2.start()
+    p3.start()
+    # p4.start()
+    p5.start()
+
+    results = []
+    for i in range(4):
+        results.append(q.get())
+
+    p1.join()
+    p2.join()
+    p3.join()
+    # p4.join()
+    p5.join()
+
+    vectorU = results
+    return vectorU
+
+
+def getTempoVector(path):
+    y, sr = librosa.load(path, sr=None, mono=True)
+    vector = []
+    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr *0.5))
+    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr))
+    vector.append(TempoGetter.get_tempo_from_onset(mp3Path=" ",y=y, sr=sr))
+
+    # vector.append(DynamicTempoAlgo(path, y, sr))
+    holder, tempo1, tempo2, tempo3 = DTA_Getter(path,y, sr)
+    vector.append(holder[tempo1][1])
+    vector.append(holder[tempo2][1])
+    return vector, y, sr
+
 
 
 def combinedAlgo(path_list):

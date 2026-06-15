@@ -6,6 +6,7 @@ from multiprocessing import Pool
 import librosa
 import TempoEstimator
 import TempoGetter
+import TempoTable
 
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
@@ -118,11 +119,80 @@ if __name__ == "__main__":
     # print(TempoEstimator.DynamicTempoAlgo(pathList[108]))
     # print(TempoEstimator.DynamicTempoAlgo(pathList[89]))
     # print(TempoEstimator.DynamicTempoAlgo(pathList[91]))
-    for i in range(6, len(pathList), 5):
-        print(pathList[i])
-        print(TempoEstimator.DynamicTempoAlgo(pathList[i]))
+    # for i in pathList:
+    #     vector = TempoEstimator.getTempoVector(i)
+    #     vector[3] = TempoEstimator.DTA_checker(vector[3])
+    #     print(vector)
+
+    dummy = [151.9991, 99.384, 99.384, 150]
+    dummy2 = [103.3594, 105.4688, 105.4688, 105]
+    dummy1 = []
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[60])
+    # print(pathList[60])
+    # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # vector[3] = TempoEstimator.crossChecker(vector, dummy)
+    # print(vector, '\n')
+
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[6])
+    # print(pathList[6])
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[10])
+    # print(pathList[10])
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[30])
+    # print(pathList[30])
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[22])
+    # print(pathList[22])
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[9])
+    # print(pathList[9] )
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[109])
+    # print(pathList[109] )
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
+    # print(vector, '\n')
+    #
+    # vector, y, sr = TempoEstimator.getTempoVector(pathList[118])
+    # print(pathList[118] )
+    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
+    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
+    # print(vector, '\n')
+    # start = time.time()
+    # print(TempoEstimator.getTempoVectorMP(pathList[9]))
+    # end = time.time()
+    # print(f"Time elapsed: {end - start} seconds\n")
+
+
+    start = time.time()
+    print(pathList[12])
+    vector, y, sr = (TempoEstimator.getTempoVector(pathList[12]))
+    print(vector)
+    end = time.time()
+    print(f"Time elapsed: {end - start} seconds")
+
+    start = time.time()
+    print(pathList[91])
+    vector, y, sr = (TempoEstimator.getTempoVector(pathList[91]))
+    print(vector)
+    end = time.time()
+    print(f"Time elapsed: {end - start} seconds")
     # print(TempoEstimator.DynamicTempoAlgo(pathList[2]))
     # print(TempoGetter.get_Dtempo(pathList[2], sr_multiplier= 4, starting_tempo= 160))
     # TempoEstimator.combinedAlgo(pathList)
-    end = time.time()
-    print(f"Time elapsed: {end - start} seconds")

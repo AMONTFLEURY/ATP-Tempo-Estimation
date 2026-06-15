@@ -3,6 +3,10 @@ import multiprocessing
 import pandas as pd
 import statistics as stats
 from numpy.ma.extras import average
+import json
+
+TempoTableJson = ('{[151.9991, 99.384, 99.384, 150],'
+              '[103.3594, 105.4688, 105.4688, 105]}')
 
 
 def pullPaths():

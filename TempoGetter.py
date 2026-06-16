@@ -20,7 +20,7 @@ def getTempo(mp3Path):
     tempo = tempo.round()
 
 
-def getRawTempo(mp3Path=None, srm=1, y=None, sr=None):
+def getRawTempo(mp3Path=None, srm=2, y=None, sr=None):
     if sr == None:
         y, sr = librosa.load(mp3Path, sr=None, mono=True, offset=15, duration=130)
     tempo, beats = librosa.beat.beat_track(y=y, sr=sr * srm)

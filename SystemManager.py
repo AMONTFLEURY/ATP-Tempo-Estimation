@@ -12,10 +12,10 @@ TempoTableJson = ('{[151.9991, 99.384, 99.384, 150],'
 def pullPaths():
     songPaths = []
     songNames = []
-    fileScanner = os.scandir("Music")
+    fileScanner = os.scandir("Music2")
     for files in fileScanner:
         fileName = files
-        songPaths.append("Music/" + (fileName.__str__())[11:-2])
+        songPaths.append("Music2/" + (fileName.__str__())[11:-2])
         songName = ((fileName.__str__())[11:-2])
         songName = songName.replace(" (SPOTISAVER)", "")
         songName = songName.replace(".mp3", "")

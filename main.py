@@ -179,20 +179,27 @@ if __name__ == "__main__":
     # end = time.time()
     # print(f"Time elapsed: {end - start} seconds\n")
 
+    #
+    # start = time.time()
+    # print(pathList[12])
+    # vector, y, sr = (TempoEstimator.getTempoVector(pathList[12]))
+    # print(vector)
+    # end = time.time()
+    # print(f"Time elapsed: {end - start} seconds")
+    #
+    # start = time.time()
+    # print(pathList[91])
+    # vector, y, sr = (TempoEstimator.getTempoVector(pathList[91]))
+    # print(vector)
 
-    start = time.time()
-    print(pathList[12])
-    vector, y, sr = (TempoEstimator.getTempoVector(pathList[12]))
-    print(vector)
+    with Pool(8) as p:
+        for result in p.imap(TempoGetter.getRawTempo, pathList):
+            print(result)
     end = time.time()
+
     print(f"Time elapsed: {end - start} seconds")
 
-    start = time.time()
-    print(pathList[91])
-    vector, y, sr = (TempoEstimator.getTempoVector(pathList[91]))
-    print(vector)
-    end = time.time()
-    print(f"Time elapsed: {end - start} seconds")
+
     # print(TempoEstimator.DynamicTempoAlgo(pathList[2]))
     # print(TempoGetter.get_Dtempo(pathList[2], sr_multiplier= 4, starting_tempo= 160))
     # TempoEstimator.combinedAlgo(pathList)

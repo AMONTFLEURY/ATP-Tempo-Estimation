@@ -22,107 +22,64 @@ def getBeatTimeSpacing(path):
     beat_team = librosa.frames_to_time(beats, sr=sr)
 
 
+def getSongList():
+    for i in songList:
+        print(i)
+
+
+def getTemposFromString():
+    nums = SystemManager.cutLetters(SystemManager.test)
+    for i in nums:
+        print(i)
+
+
+def getAllRawTempos(cores):
+    with Pool(cores) as p:
+        for result in p.imap(TempoGetter.getRawTempo, pathList):
+            print(result)
+
+
+def getAllTempoOneset(cores):
+    with Pool(cores) as p:
+        for result in p.imap(TempoGetter.get_tempo_from_onset, pathList):
+            print(result)
+
+
+def getVector(index):
+    print(pathList[index])
+    vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
+    print(vector)
+
+
+def getAllVectors(cores):
+    with Pool(cores) as p:
+        for result in p.imap(TempoEstimator.getTempoVector, pathList):
+            print(result[0][1])
+
+
+def EstimateFromDTA(index):
+    print(TempoEstimator.DynamicTempoAlgo(pathList[index]))
+
+
+def EstimateFromDTA_All():
+    for i in pathList:
+        print(TempoEstimator.DynamicTempoAlgo(pathList[i]))
+
+
+def getAllTemposFromDT(cores):
+    with Pool(cores) as p:
+        for result in p.imap(TempoEstimator.getTempoFromDynamTempoArray, pathList):
+            print(result[0])
+
+
+def Tempo_from_Tempo():
+    for i in pathList:
+        x = (TempoEstimator.getTempoFromDynamTempoArray(i))
+        print(TempoGetter.estimate_Tempo_From_Tempo(mp3Path=i, tempo=x[0]))
+
+
 if __name__ == "__main__":
     start = time.time()
-    # print(TempoGetter.getRawTempo(CPU_list[1][1]))
-    # for song in pathList:
-    #     (TempoGetter.getRawTempo(song, 1))
-    # print("----------------------------------------------------------------")
-
-    # for song in pathList:
-    #     print(song)
-    #     print(TempoGetter.get_Dtempo_from_onset(song, sr_multiplier=1))
-    #     print(TempoGetter.get_Dtempo_from_onset(song, sr_multiplier=0.5))
-
-    # for song in pathList:
-    #     print(TempoEstimator.get_tempo_from_onset(song, sr_multiplier=1))
-
-    # for song in pathList:
-    #     tempo = TempoGetter.getRawTempo(song, srm=0.5)
-    #     print(TempoGetter.estimate_Tempo_From_Tempo(song, tempo=floor(tempo), sr_multiplier=1))
-    #
-    # print(TempoGetter.get_Dtempo_from_onset(pathList[20], sr_multiplier=1))
-
-    # i = 90
-    # timeSer, sr = librosa.load(pathList[i], sr=None, mono=True)
-    #
-    # print(songList[i])
-    # tempo = (TempoGetter.getRawTempo(pathList[i], 2))
-    # print(tempo)
-    # print(librosa.feature.tempo(y=timeSer, sr=sr))
-    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=2, onset=True, starting_tempo=tempo, interval=200)
-    # # print(len(y))
-    # print("average deviation", SystemManager.get_average_deviation(y))
-    # print(x)
-    # print("------------------------------------------")
-    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=2, onset=False, starting_tempo=tempo, interval=200)
-    # # print(len(y))
-    # print("average deviation", SystemManager.get_average_deviation(y))
-    # print(x)
-    # print("------------------------------------------")
-    # x, y = TempoGetter.get_Dtempo(pathList[i], sr_multiplier=.5, onset=False, starting_tempo=92, interval=50)
-    # # print(len(y))
-    # print("average deviation", SystemManager.get_average_deviation(y))
-    # print(x)
-    # print("------------------------------------------")
-    # print(librosa.get_duration(y=timeSer, sr=sr))
-    # print(librosa.get_samplerate(pathList[i]))
-    # print(TempoEstimator.estimate(pathList[0]))
-    # with Pool(8) as p:
-    #     for result in p.imap(TempoEstimator.DynamicTempoAlgo, pathList):
-    #         print(result)
-    # for i in pathList:
-    #     print(TempoEstimator.DynamicTempoAlgo(i))
-    # TempoGetter.get_Dtempo(mp3Path=pathList[j])
-    # y, sr = librosa.load(pathList[125], sr= None)
-    # print(sr)
-    # tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1, start_bpm= 120)
-    # beat_team = librosa.frames_to_time(beats, sr=sr)
-    # # print(beat_team, len(beat_team))
-    # tempo = round(tempo[0])
-    # temp = 165
-    # print( tempo)
-    # print(beat_team[tempo] - beat_team[0])
-    # print(beat_team[-1] - beat_team[-tempo])
-    # for i in pathList:
-    #     y, sr = librosa.load(i, sr=None)
-    #     tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1, start_bpm=120)
-    #     beat_team = librosa.frames_to_time(beats, sr=sr)
-    #     tempo = round(tempo[0])
-    #     x1 = (beat_team[tempo] - beat_team[0])
-    #     x2 = (beat_team[-1] - beat_team[-tempo])
-    #     print(x2)
-
-    # y, sr = librosa.load(pathList[38])
-
-    # tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1, start_bpm=120)
-    # beat_team = librosa.frames_to_time(beats, sr=sr)
-    # print(beat_team, len(beat_team))
-    # tempo = round(tempo[0])
-    # temp = 165
-    # print(tempo)
-
-    # print(beat_team[-1] - beat_team[-tempo])
-    # print(beat_team[temp * 3] - beat_team[temp * 2])
-    # print(beat_team[temp * 4] - beat_team[temp * 3])
-
-    # print(tempo)
-
-    # print(SystemManager.findFirstBeat())
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[j]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[52]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[47]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[38]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[125]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[126]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[20]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[108]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[89]))
-    # print(TempoEstimator.DynamicTempoAlgo(pathList[91]))
-    # for i in pathList:
-    #     vector = TempoEstimator.getTempoVector(i)
-    #     vector[3] = TempoEstimator.DTA_checker(vector[3])
-    #     print(vector)
 
     dummy = [151.9991, 99.384, 99.384, 150]
     dummy2 = [103.3594, 105.4688, 105.4688, 105]
@@ -191,14 +148,15 @@ if __name__ == "__main__":
     # print(pathList[91])
     # vector, y, sr = (TempoEstimator.getTempoVector(pathList[91]))
     # print(vector)
-
-    with Pool(8) as p:
-        for result in p.imap(TempoGetter.getRawTempo, pathList):
-            print(result)
+    #
+    # with Pool(12) as p:
+    #     for result in p.imap(TempoGetter.getRawTempo, pathList):
+    #         print(result)
+    #
+    Tempo_from_Tempo()
     end = time.time()
 
     print(f"Time elapsed: {end - start} seconds")
-
 
     # print(TempoEstimator.DynamicTempoAlgo(pathList[2]))
     # print(TempoGetter.get_Dtempo(pathList[2], sr_multiplier= 4, starting_tempo= 160))

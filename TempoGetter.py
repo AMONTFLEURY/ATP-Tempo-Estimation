@@ -5,7 +5,7 @@ import SystemManager
 
 def estimate_Tempo_From_Tempo(tempo, sr_multiplier=1.0, y=None, sr=None, mp3Path="None"):
     if y is None:
-        y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=60, offset=30)
+        y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=90, offset=30)
     tempo, beatFrames = librosa.beat.beat_track(y=y, sr=sr * sr_multiplier, start_bpm=tempo)
     return round(tempo[0])
     pass
@@ -20,10 +20,10 @@ def getTempo(mp3Path):
     tempo = tempo.round()
 
 
-def getRawTempo(mp3Path=None, srm=2, y=None, sr=None):
+def getRawTempo(mp3Path=None, srm=.5, y=None, sr=None):
     if sr == None:
-        y, sr = librosa.load(mp3Path, sr=None, mono=True, offset=15, duration=130)
-    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * srm)
+        y, sr = librosa.load(mp3Path, sr=None, mono=True)
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * srm,start_bpm=150)
 
     return round(tempo[0], 4)
 
@@ -78,7 +78,7 @@ def get_tempo_from_onset(mp3Path, sr_multiplier=1.0, y = None, sr=None, tempo = 
         y, sr = librosa.load(mp3Path, sr=None, mono=True)
     onset_env = librosa.onset.onset_strength(y=y, sr=sr * sr_multiplier, )
     tempo = librosa.feature.tempo(onset_envelope=onset_env, sr=sr)
-    return round(tempo[0], 4)
+    return round(tempo[0], 5)
 
 
 def getBeatTime(mp3Path="", sr_multiplier=1.0, y=None, sr=None, tempoE = 120):

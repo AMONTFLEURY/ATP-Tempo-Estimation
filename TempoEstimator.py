@@ -293,9 +293,9 @@ def getTempoVectorMP(path):
 def getTempoVector(path):
     y, sr = librosa.load(path, sr=None, mono=True)
     vector = []
-    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr *0.5))
-    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr))
-    vector.append(TempoGetter.get_tempo_from_onset(mp3Path=" ",y=y, sr=sr))
+    # vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr *0.5))
+    # vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr))
+    # vector.append(TempoGetter.get_tempo_from_onset(mp3Path=" ",y=y, sr=sr))
 
     # vector.append(DynamicTempoAlgo(path, y, sr))
     holder, tempo1, tempo2, tempo3 = DTA_Getter(path,y, sr)

@@ -1,3 +1,5 @@
+import math
+
 import librosa
 import statistics as stats
 import SystemManager
@@ -5,7 +7,7 @@ import SystemManager
 
 def estimate_Tempo_From_Tempo(tempo, sr_multiplier=1.0, y=None, sr=None, mp3Path="None"):
     if y is None:
-        y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=60, offset=30)
+        y, sr = librosa.load(mp3Path, sr=None, mono=True, duration=90, offset=30)
     tempo, beatFrames = librosa.beat.beat_track(y=y, sr=sr * sr_multiplier, start_bpm=tempo)
     return round(tempo[0])
     pass
@@ -22,10 +24,10 @@ def getTempo(mp3Path):
 
 def getRawTempo(mp3Path=None, srm=1, y=None, sr=None):
     if sr == None:
-        y, sr = librosa.load(mp3Path, sr=None, mono=True, offset=15, duration=130)
-    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * srm)
+        y, sr = librosa.load(mp3Path, sr=None, mono=True)
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * srm, start_bpm=120)
 
-    return round(tempo[0], 4)
+    return float(round(tempo[0], 4))
 
 
 def get_onsets(mp3Path, hopLength=512, startBPM=120):
@@ -49,7 +51,7 @@ def get_Dtempo_from_onset(mp3Path, sr_multiplier=1.0):
     return dynamicTempoArray, dtempo
 
 
-def get_Dtempo(mp3Path = "", onset=False, sr_multiplier=1.0, interval=300, y= None, sr=0, starting_tempo=120):
+def get_Dtempo(mp3Path="", onset=False, sr_multiplier=1.0, interval=300, y=None, sr=0, starting_tempo=120):
     dynamicTempoArray = []
     if y is None:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)
@@ -73,22 +75,23 @@ def get_Dtempo(mp3Path = "", onset=False, sr_multiplier=1.0, interval=300, y= No
     return dynamicTempoArray, dTempo
 
 
-def get_tempo_from_onset(mp3Path, sr_multiplier=1.0, y = None, sr=None, tempo = 120):
+def get_tempo_from_onset(mp3Path, sr_multiplier=1.0, y=None, sr=None, tempo=120):
     if y is None:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)
     onset_env = librosa.onset.onset_strength(y=y, sr=sr * sr_multiplier, )
     tempo = librosa.feature.tempo(onset_envelope=onset_env, sr=sr)
-    return round(tempo[0], 4)
+    return float(round(tempo[0], 4))
 
 
-def getBeatTime(mp3Path="", sr_multiplier=1.0, y=None, sr=None, tempoE = 120):
+def getBeatTime(mp3Path="", sr_multiplier=1.0, y=None, sr=None, tempoE=120):
     if y is None:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)
     tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1, start_bpm=tempoE)
     beats = librosa.frames_to_time(beats, sr=sr)
     return round(beats[tempoE] - beats[0], 4), round(beats[-1] - beats[-tempoE], 4)
 
-def DTA_Getter(path = "", y =None, sr = None, starting_tempo = 120):
+
+def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
     # print(path)
     if path != "":
         y, sr = librosa.load(path, mono=True, sr=None)
@@ -101,7 +104,7 @@ def DTA_Getter(path = "", y =None, sr = None, starting_tempo = 120):
 
     # intailizing the holder array for the while loop to work
     dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False, sr_multiplier=1,
-                                                             starting_tempo=starting_tempo, interval=200)
+                                                 starting_tempo=starting_tempo, interval=200)
     # Gets average deviation
     avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
     # just to get the mode
@@ -111,8 +114,8 @@ def DTA_Getter(path = "", y =None, sr = None, starting_tempo = 120):
     while tempo1 == 0:
         starting_tempo += increment
         dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False,
-                                                                 sr_multiplier=0.5,
-                                                                 starting_tempo=starting_tempo, interval=200)
+                                                     sr_multiplier=0.5,
+                                                     starting_tempo=starting_tempo, interval=200)
         avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
         mode = stats.mode(dynam_tempo_array0)
         holder.append([starting_tempo, mode, avg_dev0])
@@ -122,3 +125,19 @@ def DTA_Getter(path = "", y =None, sr = None, starting_tempo = 120):
         # that index will be stored,
         if holder[-1][2] > holder[-2][2]:
             return holder[-1]
+
+
+def Tempo_TimeFrame(path="", y=None, sr=None, starting_tempo=120, frame_len = 120):
+    if sr == None:
+        y, sr = librosa.load(path, sr=None, mono=True)
+
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr, start_bpm=120)
+    beats = librosa.frames_to_time(beats, sr=sr)
+    x = beats[0]
+
+
+    y, sr = librosa.load(path, offset=x, duration= frame_len, sr=None)
+    tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1)
+
+    return float(round(tempo[0], 4)), math.floor(len(beats)/2)
+

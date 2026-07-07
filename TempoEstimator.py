@@ -72,13 +72,13 @@ def getTempoFromDynamTempoArray(path, tempo=120, onset=False, sr=1):
     return mode, round(float(avg_dev0), 4)
 
 
-def DynamicTempoAlgo(path = "", y = None, sr = None):
+def DynamicTempoAlgo(path="", y=None, sr=None):
     holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y=y, sr=sr)
     estimated = DTA_Analyzer(holder, tempo1, tempo2, tempo3, path, y=y, sr=sr)
     return estimated
 
 
-def DTA_Getter(path = "", y =None, sr = None):
+def DTA_Getter(path="", y=None, sr=None):
     # print(path)
     if path != "":
         y, sr = librosa.load(path, mono=True, sr=None)
@@ -217,15 +217,15 @@ def checkBeatTiming(path, estimated_tempo, tempo2):
 #     base[i].append(arg)
 
 
-def crossChecker(array, dummy, weight = 2):
+def crossChecker(array, dummy, weight=2):
     weight = -weight
     if array[3] < 0:
         if dummy[0] == array[0]:
-            weight+=1
+            weight += 1
         if dummy[1] == array[1]:
-            weight+=1
+            weight += 1
         if dummy[2] == array[2]:
-            weight+=2
+            weight += 2
     if weight >= 0:
         return dummy[3]
     else:
@@ -237,31 +237,36 @@ def DTA_checker(array, y, sr):
         tempo = TempoGetter.estimate_Tempo_From_Tempo(y=y, sr=sr, tempo=array[0])
         x1, x2 = TempoGetter.getBeatTime(y=y, sr=sr)
         if x1 > 60 and x2 > 60:
-            tempo+=1
+            tempo += 1
         elif x1 < 60 and x2 > 60:
-            tempo-=1
+            tempo -= 1
         return tempo
     else:
         return -9
 
-def process_1(y, sr, path ="", q= None):
-    q.put(TempoGetter.getRawTempo( mp3Path=path, y= y, sr=sr * 0.5))
 
-def process_2(y, sr, path ="", q= None):
-    q.put(TempoGetter.getRawTempo(mp3Path=path, y= y, sr=sr))
+def process_1(y, sr, path="", q=None):
+    q.put(TempoGetter.getRawTempo(mp3Path=path, y=y, sr=sr * 0.5))
 
-def process_3(y, sr, path ="", q= None):
+
+def process_2(y, sr, path="", q=None):
+    q.put(TempoGetter.getRawTempo(mp3Path=path, y=y, sr=sr))
+
+
+def process_3(y, sr, path="", q=None):
     q.put(TempoGetter.get_tempo_from_onset(mp3Path="", y=y, sr=sr))
 
-def process_4(y, sr, path ="", q= None):
+
+def process_4(y, sr, path="", q=None):
     q.put(DynamicTempoAlgo(path, y, sr))
 
-def process_5(y, sr, path ="", q= None):
-    holder, tempo1, tempo2, tempo3 = DTA_Getter(path,y, sr)
+
+def process_5(y, sr, path="", q=None):
+    holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y, sr)
     q.put([holder[tempo1][1], holder[tempo2][1]])
 
-def getTempoVectorMP(path):
 
+def getTempoVectorMP(path):
     y, sr = librosa.load(path, sr=None, mono=True)
     q = Queue()
     p1 = multiprocessing.Process(target=process_1, args=(y, sr, path, q))
@@ -292,17 +297,25 @@ def getTempoVectorMP(path):
 
 def getTempoVector(path):
     y, sr = librosa.load(path, sr=None, mono=True)
-    vector = []
-    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr *0.5))
-    vector.append(TempoGetter.getRawTempo(path, y= y, sr=sr))
-    vector.append(TempoGetter.get_tempo_from_onset(mp3Path=" ",y=y, sr=sr))
+    vector = [0]
+    vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.5))
+    vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr))
+    vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 2))
+
+    vector.append(TempoGetter.get_tempo_from_onset(mp3Path=" ", y=y, sr=sr))
+
+    x1, x2 = TempoGetter.Tempo_TimeFrame(path=path)
+    vector.append(x1)
+    vector.append(x2)
 
     # vector.append(DynamicTempoAlgo(path, y, sr))
-    holder, tempo1, tempo2, tempo3 = DTA_Getter(path,y, sr)
+    # vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.33))
+
+    holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y, sr)
     vector.append(holder[tempo1][1])
     vector.append(holder[tempo2][1])
-    return vector, y, sr
 
+    return vector, y, sr
 
 
 def combinedAlgo(path_list):
@@ -314,7 +327,7 @@ def combinedAlgo(path_list):
     for i in range(len(path_list)):
         base[i].append(TempoGetter.getRawTempo(path_list[i], srm=0.5))
         base[i].append(TempoGetter.getRawTempo(path_list[i]))
-        base[i].append(TempoGetter.get_tempo_from_onset(path_list[i],))
+        base[i].append(TempoGetter.get_tempo_from_onset(path_list[i], ))
     for i in range(len(path_list)):
         base[i].append(DynamicTempoAlgo(path_list[i]))
     for i in range(len(path_list)):

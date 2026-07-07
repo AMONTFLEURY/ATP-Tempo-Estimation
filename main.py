@@ -6,7 +6,9 @@ from multiprocessing import Pool
 import librosa
 import TempoEstimator
 import TempoGetter
+import ModelTrainer
 import TempoTable
+import pygame
 
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
@@ -46,15 +48,20 @@ def getAllTempoOneset(cores):
 
 
 def getVector(index):
-    print(pathList[index])
+    print(songList[index])
     vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
     print(vector)
+    return vector
 
 
 def getAllVectors(cores):
+    frame = []
     with Pool(cores) as p:
         for result in p.imap(TempoEstimator.getTempoVector, pathList):
-            print(result[0][1])
+            frame.append(result[0])
+            print(len(frame), "out of", len(songList))
+    print(frame)
+    return frame
 
 
 def EstimateFromDTA(index):
@@ -78,83 +85,48 @@ def Tempo_from_Tempo():
         print(TempoGetter.estimate_Tempo_From_Tempo(mp3Path=i, tempo=x[0]))
 
 
+def nextButton():
+    input("Press Enter to Continue")
+
+
+def Interface():
+    print("CPU Core count: ", SystemManager.getCPUcount(),
+          "\nSong List Length: ", len(songList))
+
+    input("Press Enter to Start ")
+
+    while True:
+        choice = input("""
+    CPU Core count: ",SystemManager.getCPUcount(),
+    Song List Length: , len(songList))
+    1. Get All Tempos
+    2. Get One Tempo
+    3. 
+    """)
+        if choice == "1":
+            cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
+            getAllVectors(int(cores))
+        elif choice == '2':
+            index = input("index:")
+            getVector(int(index))
+            nextButton()
+
+
 if __name__ == "__main__":
     start = time.time()
+    #
+    # dummy = [151.9991, 99.384, 99.384, 150]
+    # dummy2 = [103.3594, 105.4688, 105.4688, 105]
+    # dummy1 = []
+    #
+    # new_data = getVector(57)
+    # ModelTrainer.create_referenceTable()
+    # ModelTrainer.add_referenceRow(new_data)
+    # ModelTrainer.saveTable()
 
-    dummy = [151.9991, 99.384, 99.384, 150]
-    dummy2 = [103.3594, 105.4688, 105.4688, 105]
-    dummy1 = []
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[60])
-    # print(pathList[60])
-    # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # vector[3] = TempoEstimator.crossChecker(vector, dummy)
-    # print(vector, '\n')
-
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[6])
-    # print(pathList[6])
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[10])
-    # print(pathList[10])
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[30])
-    # print(pathList[30])
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[22])
-    # print(pathList[22])
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[9])
-    # print(pathList[9] )
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[109])
-    # print(pathList[109] )
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
-    # print(vector, '\n')
-    #
-    # vector, y, sr = TempoEstimator.getTempoVector(pathList[118])
-    # print(pathList[118] )
-    # # vector[3] = TempoEstimator.DTA_checker(vector, y, sr)
-    # # vector[3] = TempoEstimator.crossChecker(vector, dummy2)
-    # print(vector, '\n')
-    # start = time.time()
-    # print(TempoEstimator.getTempoVectorMP(pathList[9]))
-    # end = time.time()
-    # print(f"Time elapsed: {end - start} seconds\n")
-
-    #
-    # start = time.time()
-    # print(pathList[12])
-    # vector, y, sr = (TempoEstimator.getTempoVector(pathList[12]))
-    # print(vector)
-    # end = time.time()
-    # print(f"Time elapsed: {end - start} seconds")
-    #
-    # start = time.time()
-    # print(pathList[91])
-    # vector, y, sr = (TempoEstimator.getTempoVector(pathList[91]))
-    # print(vector)
-    #
-    # with Pool(12) as p:
-    #     for result in p.imap(TempoGetter.getRawTempo, pathList):
-    #         print(result)
-    #
-    Tempo_from_Tempo()
     end = time.time()
+    getAllVectors(8)
+    Interface()
 
     print(f"Time elapsed: {end - start} seconds")
 

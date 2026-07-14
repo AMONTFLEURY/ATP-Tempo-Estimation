@@ -9,8 +9,6 @@ import TempoGetter
 import RefTableManager
 import os
 import TempoTable
-import pygame
-
 import UDManager
 
 pathList, songList = (SystemManager.pullPaths())
@@ -76,7 +74,8 @@ def getAllVectors(cores):
             frame.append(result[0])
             print(len(frame), "out of", len(songList))
             print(result[0])
-    print(frame)
+    for i in frame:
+        print(i)
 
     return frame
 

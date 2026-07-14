@@ -5,9 +5,12 @@ import statistics as stats
 from numpy.ma.extras import average
 import json
 import re
+import pandas as pd
 
-TempoTableJson = ('{[151.9991, 99.384, 99.384, 150],'
-                  '[103.3594, 105.4688, 105.4688, 105]}')
+H_res = 1920
+V_res = 1080
+gameRate = 240
+frameRate = 120
 
 
 def pullPaths():
@@ -23,6 +26,12 @@ def pullPaths():
         songNames.append(songName)
         # print(songName)
     return songPaths, songNames
+
+
+def checkFiles():
+    files = os.scandir()
+    for i in files:
+        print(i)
 
 
 def getCPUcount():
@@ -75,7 +84,7 @@ def cutLetters(string):
     nums = []
     buffer = ""
     for i in range(len(string)):
-        index = string[i:i+12]
+        index = string[i:i + 12]
         if bool(re.search(r"[0-9]", string[i])):
             buffer += string[i]
         else:
@@ -86,6 +95,7 @@ def cutLetters(string):
                     pass
                 buffer = ""
     return nums
+
 
 #                 if len(buffer) == 1 or string[i] == '\n' or int(buffer) > 170 or bool(re.search(r'[a-zA-Z]', string[i+1])):
 test = """002 Mello - Love Lightside (Love Sickubus).mp3

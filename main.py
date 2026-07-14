@@ -6,9 +6,12 @@ from multiprocessing import Pool
 import librosa
 import TempoEstimator
 import TempoGetter
-import ModelTrainer
+import RefTableManager
+import os
 import TempoTable
 import pygame
+
+import UDManager
 
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
@@ -16,6 +19,8 @@ CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
 # for jobs in CPU_list:
 #     print(jobs)
 tempoList = []
+frame = []
+loaded_songs = []
 
 
 def getBeatTimeSpacing(path):
@@ -25,9 +30,14 @@ def getBeatTimeSpacing(path):
 
 
 def getSongList():
-    for i in songList:
-        print(i)
+    for i in range(len(songList)):
+        print(i, ":", songList[i])
 
+
+def getLoaded():
+    # for i in loaded_songs:
+    #     print(i)
+    UDManager.print_UserData()
 
 def getTemposFromString():
     nums = SystemManager.cutLetters(SystemManager.test)
@@ -49,18 +59,25 @@ def getAllTempoOneset(cores):
 
 def getVector(index):
     print(songList[index])
-    vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
-    print(vector)
-    return vector
+    # UDManager.check_for_index(songList[index])
+
+    if not UDManager.check_for_index(songList[index]):
+        vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
+        print(vector)
+        new = [index, songList[index], vector]
+        loaded_songs.append(new)
+        UDManager.add_row(loaded_songs[-1])
+        return vector
 
 
 def getAllVectors(cores):
-    frame = []
     with Pool(cores) as p:
         for result in p.imap(TempoEstimator.getTempoVector, pathList):
             frame.append(result[0])
             print(len(frame), "out of", len(songList))
+            print(result[0])
     print(frame)
+
     return frame
 
 
@@ -89,6 +106,11 @@ def nextButton():
     input("Press Enter to Continue")
 
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    # print("\n" * 100)
+
+
 def Interface():
     print("CPU Core count: ", SystemManager.getCPUcount(),
           "\nSong List Length: ", len(songList))
@@ -96,12 +118,17 @@ def Interface():
     input("Press Enter to Start ")
 
     while True:
-        choice = input("""
-    CPU Core count: ",SystemManager.getCPUcount(),
-    Song List Length: , len(songList))
+        clear_screen()
+        choice = input(f"""
+    CPU Core count: {SystemManager.getCPUcount()},\
+    Song List Length: {len(songList)}
     1. Get All Tempos
-    2. Get One Tempo
-    3. 
+    2. Get One Tempo vector
+    3. List of all songs
+    4.View table
+    5. Get loaded songs
+    6. Verify Files 
+    7. Save User Data
     """)
         if choice == "1":
             cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
@@ -109,7 +136,17 @@ def Interface():
         elif choice == '2':
             index = input("index:")
             getVector(int(index))
-            nextButton()
+        elif choice == '3':
+            getSongList()
+        elif choice == '4':
+            RefTableManager.view_reference_table()
+        elif choice == '5':
+            getLoaded()
+        elif choice == '6':
+            SystemManager.checkFiles()
+        elif choice == '7':
+            UDManager.saveTable()
+        nextButton()
 
 
 if __name__ == "__main__":
@@ -124,8 +161,9 @@ if __name__ == "__main__":
     # ModelTrainer.add_referenceRow(new_data)
     # ModelTrainer.saveTable()
 
+    # getAllVectors(16)
     end = time.time()
-    getAllVectors(8)
+
     Interface()
 
     print(f"Time elapsed: {end - start} seconds")

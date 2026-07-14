@@ -4,12 +4,14 @@ import math
 import pandas as pd
 
 csv_path = "data.csv"
-df = pd.read_csv(csv_path, sep='\t')
+df = pd.read_csv(csv_path)
 
 
-def create_referenceTable():
+def view_reference_table():
     print(df)
 
+def create_RTable_from_list(temp_df):
+    pass
 
 def saveTable():
     df.to_csv(csv_path, index=False)

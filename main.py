@@ -72,10 +72,34 @@ def getAllVectors(cores):
     with Pool(cores) as p:
         for result in p.imap(TempoEstimator.getTempoVector, pathList):
             frame.append(result[0])
-            print(len(frame), "out of", len(songList))
-            print(result[0])
+            # print(len(frame), "out of", len(songList))
+            # print(result[0])
     for i in frame:
-        print(i)
+        print(i[1])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[2])
+    print('---------------------------------------------')
+
+    for i in frame:
+        print(i[3])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[4])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[5])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[6])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[7])
+    print('---------------------------------------------')
+    for i in frame:
+        print(i[8])
+    print('---------------------------------------------')
+
 
     return frame
 
@@ -119,6 +143,9 @@ def Interface():
     while True:
         clear_screen()
         choice = input(f"""
+        
+        
+        
     CPU Core count: {SystemManager.getCPUcount()},\
     Song List Length: {len(songList)}
     1. Get All Tempos
@@ -128,6 +155,14 @@ def Interface():
     5. Get loaded songs
     6. Verify Files 
     7. Save User Data
+    
+    
+    
+    
+    
+    
+    
+    
     """)
         if choice == "1":
             cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
@@ -145,7 +180,10 @@ def Interface():
             SystemManager.checkFiles()
         elif choice == '7':
             UDManager.saveTable()
+        elif choice == '0':
+            break
         nextButton()
+
 
 
 if __name__ == "__main__":

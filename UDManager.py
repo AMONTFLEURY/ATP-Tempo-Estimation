@@ -1,8 +1,13 @@
 import pandas as pd
+from numba import none
+
 pd.set_option('display.max_rows', None)
 
 csv_path = "Userdata.csv"
 df = pd.read_csv(csv_path)
+
+def view_user_data():
+    print(df)
 
 
 def add_row(new_data):
@@ -20,11 +25,12 @@ def saveTable():
 
 def check_for_index(title):
     if 1 <= (df['Title'] == title).sum():
-        print(df[df['Title'] == title].to_string())
-        return True
+        # print(df[df['Title'] == title].to_string())
+        return df[df['Title'] == title],
     else:
-        return False
+        return None,
 
 
 def print_UserData():
     print(df)
+

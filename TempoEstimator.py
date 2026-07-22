@@ -1,16 +1,22 @@
+import math
 import multiprocessing
 
 import librosa
+from numba import double
 from numba.cuda.libdeviceimpl import args
+from numpy import dtype
 
+import RefTableManager
 import TempoGetter
 from multiprocessing import Pool, Queue
 import SystemManager
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 import statistics as stats
+import pandas as pd
 
 from TempoGetter import getRawTempo
+from UDManager import df
 
 
 def estimate(path, threading=False):
@@ -334,3 +340,15 @@ def combinedAlgo(path_list):
         estimate_single_track(path_list[i])
     for i in range(len(path_list)):
         TempoGetter.get_onsets(path_list[i], startBPM=base[i])
+
+
+def cross_checker(test_vector):
+    test_vector = test_vector[0]
+    # print(test_vector.iloc[0, 5], type(test_vector.iloc[0, 5]))
+    slice1, slice2 = RefTableManager.get_table_slices(test_vector.iloc[0, 5])
+    print(type(slice1))
+    print(type(slice2))
+
+
+
+

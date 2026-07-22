@@ -1,3 +1,4 @@
+from numba import none
 from numpy.ma.core import floor
 from numpy.ma.extras import average
 import time
@@ -10,7 +11,7 @@ import RefTableManager
 import os
 import TempoTable
 import UDManager
-
+import pandas as pd
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
 CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
@@ -58,14 +59,16 @@ def getAllTempoOneset(cores):
 def getVector(index):
     print(songList[index])
     # UDManager.check_for_index(songList[index])
-
-    if not UDManager.check_for_index(songList[index]):
+    x = UDManager.check_for_index(songList[index])
+    if x == None:
         vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
         print(vector)
         new = [index, songList[index], vector]
         loaded_songs.append(new)
         UDManager.add_row(loaded_songs[-1])
-        return vector
+    vector = UDManager.check_for_index(songList[index])
+    print(vector)
+    return vector
 
 
 def getAllVectors(cores):
@@ -128,6 +131,54 @@ def Tempo_from_Tempo():
 def nextButton():
     input("Press Enter to Continue")
 
+def date_management_screen():
+    while True:
+        choice = input(""""
+        1. Save User Data
+        2. Save Model Data
+        3. Print User Data
+        4. Print Model Data
+        5. Print Training Data
+        6. Back
+        """)
+        if choice == "1":
+            UDManager.saveTable()
+        if choice == "2":
+            RefTableManager.saveTable()
+        if choice == "3":
+            UDManager.view_user_data()
+        if choice == "4":
+            RefTableManager.view_reference_table()
+        if choice == "5":
+            RefTableManager.view_training_data()
+        if choice == "6":
+            break
+    nextButton()
+
+def tempo_estimator_screen():
+    while True:
+        choice = input("""
+        1. Get all Tempo Vectors
+        2. Get Single Tempo Vector
+        3. Estimate All Tempos
+        4. Estimate Single Tempo
+        """)
+        if choice == "1":
+            cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
+            getAllVectors(int(cores))
+        if choice == "2":
+            index = input("index:")
+            getVector(int(index))
+        if choice == "3":
+            pass
+        if choice == "4":
+            pass
+        if choice == "5":
+            break
+
+
+
+
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -148,40 +199,33 @@ def Interface():
         
     CPU Core count: {SystemManager.getCPUcount()},\
     Song List Length: {len(songList)}
-    1. Get All Tempos
-    2. Get One Tempo vector
+    1. Tempo Estimator
+    2. -------------------
     3. List of all songs
-    4.View table
+    4. -----------------
     5. Get loaded songs
     6. Verify Files 
-    7. Save User Data
-    
-    
-    
-    
-    
-    
-    
-    
+    7. Data Manager
     """)
         if choice == "1":
-            cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
-            getAllVectors(int(cores))
+            tempo_estimator_screen()
         elif choice == '2':
-            index = input("index:")
-            getVector(int(index))
+            pass
         elif choice == '3':
             getSongList()
         elif choice == '4':
-            RefTableManager.view_reference_table()
+            pass
         elif choice == '5':
             getLoaded()
         elif choice == '6':
             SystemManager.checkFiles()
         elif choice == '7':
-            UDManager.saveTable()
+            date_management_screen()
         elif choice == '0':
             break
+        elif choice == '8':
+            index = input("index:")
+            TempoEstimator.cross_checker(getVector(int(index)))
         nextButton()
 
 
@@ -200,7 +244,7 @@ if __name__ == "__main__":
 
     # getAllVectors(16)
     end = time.time()
-
+    RefTableManager.create_RTable_from_list()
     Interface()
 
     print(f"Time elapsed: {end - start} seconds")

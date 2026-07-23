@@ -12,6 +12,7 @@ import os
 import TempoTable
 import UDManager
 import pandas as pd
+
 pathList, songList = (SystemManager.pullPaths())
 SystemManager.getCPUcount()
 CPU_list = SystemManager.splitPathList(fullList=pathList, jobs=4)
@@ -38,6 +39,7 @@ def getLoaded():
     #     print(i)
     UDManager.print_UserData()
 
+
 def getTemposFromString():
     nums = SystemManager.cutLetters(SystemManager.test)
     for i in nums:
@@ -59,8 +61,8 @@ def getAllTempoOneset(cores):
 def getVector(index):
     print(songList[index])
     # UDManager.check_for_index(songList[index])
-    x = UDManager.check_for_index(songList[index])
-    if x == None:
+    x, found = UDManager.check_for_index(songList[index])
+    if not found:
         vector, y, sr = (TempoEstimator.getTempoVector(pathList[index]))
         print(vector)
         new = [index, songList[index], vector]
@@ -69,6 +71,12 @@ def getVector(index):
     vector = UDManager.check_for_index(songList[index])
     print(vector)
     return vector
+
+
+def search(name):
+    for i in range(len(songList)):
+        if name in songList[i]:
+            print(i, ":", songList[i])
 
 
 def getAllVectors(cores):
@@ -103,7 +111,6 @@ def getAllVectors(cores):
         print(i[8])
     print('---------------------------------------------')
 
-
     return frame
 
 
@@ -128,18 +135,24 @@ def Tempo_from_Tempo():
         print(TempoGetter.estimate_Tempo_From_Tempo(mp3Path=i, tempo=x[0]))
 
 
+def search_song():
+    name = input("Song Name: ")
+    RefTableManager.song_lookup(name)
+
+
 def nextButton():
     input("Press Enter to Continue")
+
 
 def date_management_screen():
     while True:
         choice = input(""""
-        1. Save User Data
-        2. Save Model Data
-        3. Print User Data
-        4. Print Model Data
-        5. Print Training Data
-        6. Back
+    1. Save User Data
+    2. Save Model Data
+    3. Print User Data
+    4. Print Model Data
+    5. Print Training Data
+    6. Back
         """)
         if choice == "1":
             UDManager.saveTable()
@@ -153,7 +166,21 @@ def date_management_screen():
             RefTableManager.view_training_data()
         if choice == "6":
             break
-    nextButton()
+
+def debug_screen():
+    while True:
+        choice = input("""
+        1. Add New Data Points
+        2. Train Model
+        3. 
+        4. 
+        """)
+        if choice == '1':
+            RefTableManager.add_datapoint()
+        else:
+            break
+
+
 
 def tempo_estimator_screen():
     while True:
@@ -177,9 +204,6 @@ def tempo_estimator_screen():
             break
 
 
-
-
-
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     # print("\n" * 100)
@@ -200,17 +224,20 @@ def Interface():
     CPU Core count: {SystemManager.getCPUcount()},\
     Song List Length: {len(songList)}
     1. Tempo Estimator
-    2. -------------------
+    2. Search
     3. List of all songs
     4. -----------------
     5. Get loaded songs
     6. Verify Files 
     7. Data Manager
+    8. Debug
+    :
     """)
         if choice == "1":
             tempo_estimator_screen()
         elif choice == '2':
-            pass
+
+            search(input("name : "))
         elif choice == '3':
             getSongList()
         elif choice == '4':
@@ -229,7 +256,6 @@ def Interface():
         nextButton()
 
 
-
 if __name__ == "__main__":
     start = time.time()
     #
@@ -245,7 +271,8 @@ if __name__ == "__main__":
     # getAllVectors(16)
     end = time.time()
     RefTableManager.create_RTable_from_list()
-    Interface()
+    RefTableManager.add_datapoint()
+    # Interface()
 
     print(f"Time elapsed: {end - start} seconds")
 

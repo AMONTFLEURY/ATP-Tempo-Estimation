@@ -26,9 +26,9 @@ def saveTable():
 def check_for_index(title):
     if 1 <= (df['Title'] == title).sum():
         # print(df[df['Title'] == title].to_string())
-        return df[df['Title'] == title],
+        return df[df['Title'] == title], True
     else:
-        return None,
+        return None, False
 
 
 def print_UserData():

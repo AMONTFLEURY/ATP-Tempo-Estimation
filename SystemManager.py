@@ -11,6 +11,7 @@ H_res = 1920
 V_res = 1080
 gameRate = 240
 frameRate = 120
+Unbeatable_dir = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/CustomSongs/ATPTEST/ATP - TEST () [Easy].txt"
 
 
 def pullPaths():
@@ -95,6 +96,45 @@ def cutLetters(string):
                     pass
                 buffer = ""
     return nums
+
+
+def edit_beat_map(new_tempo, path):
+    with open(Unbeatable_dir, "r") as file:
+        lines = file.readlines()
+    beat_len = (round(60000 / new_tempo, 4))
+    bls = str(beat_len)
+    while len(bls) < 12:
+        bls = bls + "0"
+
+    beats = 1
+    lines[25] = "213,192," + str(beat_len * beats) + ",5,0,0:0:0:0:\n"
+    lines[21] = "0," + bls + ",4,2,0,100,1,0\n"
+    for i in range(26, len(lines) - 1):
+        lines[i] = beatmapper(lines[i], lines[25], beat_len)
+
+    with open(Unbeatable_dir, "w") as file:
+        file.writelines(lines)
+
+    # line[21] =
+
+
+def beatmapper(line0, base_line, bls=0.0):
+    pos = line0[0:8]
+    line0 = line0.replace(pos, "")
+    timing = re.search(r'\d+', line0)
+    timing = timing.group()
+    line0 = line0.replace(timing, "")
+
+    gap = (float(timing) / bls)
+    pos_timing = pos + str(bls * gap)
+    timing2 = re.search(r'\d+', line0[7:])
+    timing2 = timing2.group()
+    if float(timing2) > 0:
+        line0 = line0[7:].replace(timing2, "")
+        pos_timing = pos_timing + "," + str(bls * (float(timing2) / bls))
+
+    nextline = pos_timing + line0
+    return nextline
 
 
 #                 if len(buffer) == 1 or string[i] == '\n' or int(buffer) > 170 or bool(re.search(r'[a-zA-Z]', string[i+1])):

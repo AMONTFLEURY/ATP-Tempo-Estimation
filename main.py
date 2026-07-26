@@ -83,33 +83,33 @@ def getAllVectors(cores):
     with Pool(cores) as p:
         for result in p.imap(TempoEstimator.getTempoVector, pathList):
             frame.append(result[0])
-            # print(len(frame), "out of", len(songList))
-            # print(result[0])
-    for i in frame:
-        print(i[1])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[2])
-    print('---------------------------------------------')
-
-    for i in frame:
-        print(i[3])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[4])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[5])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[6])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[7])
-    print('---------------------------------------------')
-    for i in frame:
-        print(i[8])
-    print('---------------------------------------------')
+            print(len(frame), "out of", len(songList))
+            print(result[0])
+    # for i in frame:
+    #     print(i[1])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[2])
+    # print('---------------------------------------------')
+    #
+    # for i in frame:
+    #     print(i[3])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[4])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[5])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[6])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[7])
+    # print('---------------------------------------------')
+    # for i in frame:
+    #     print(i[8])
+    # print('---------------------------------------------')
 
     return frame
 
@@ -270,8 +270,9 @@ if __name__ == "__main__":
 
     # getAllVectors(16)
     end = time.time()
-    RefTableManager.create_RTable_from_list()
-    RefTableManager.add_datapoint()
+    # RefTableManager.create_RTable_from_list()
+    # RefTableManager.add_datapoint()
+    SystemManager.edit_beat_map(105, "oa")
     # Interface()
 
     print(f"Time elapsed: {end - start} seconds")

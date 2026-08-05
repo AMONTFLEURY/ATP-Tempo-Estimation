@@ -167,19 +167,23 @@ def date_management_screen():
         if choice == "6":
             break
 
+
 def debug_screen():
     while True:
         choice = input("""
         1. Add New Data Points
         2. Train Model
-        3. 
+        3. Add to data csv
         4. 
         """)
         if choice == '1':
+            # x = input("index: ")
             RefTableManager.add_datapoint()
+        elif choice == '3':
+            pass
+
         else:
             break
-
 
 
 def tempo_estimator_screen():
@@ -189,6 +193,7 @@ def tempo_estimator_screen():
         2. Get Single Tempo Vector
         3. Estimate All Tempos
         4. Estimate Single Tempo
+        0. Exit
         """)
         if choice == "1":
             cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
@@ -200,7 +205,7 @@ def tempo_estimator_screen():
             pass
         if choice == "4":
             pass
-        if choice == "5":
+        if choice == "0":
             break
 
 
@@ -251,8 +256,10 @@ def Interface():
         elif choice == '0':
             break
         elif choice == '8':
-            index = input("index:")
-            TempoEstimator.cross_checker(getVector(int(index)))
+            # index = input("index:")
+            # TempoEstimator.cross_checker(getVector(int(index)))
+            debug_screen()
+
         nextButton()
 
 
@@ -272,8 +279,10 @@ if __name__ == "__main__":
     end = time.time()
     # RefTableManager.create_RTable_from_list()
     # RefTableManager.add_datapoint()
-    SystemManager.edit_beat_map(105, "oa")
+    # Work on this LATER
+    # SystemManager.edit_beat_map(105, "oa")
     # Interface()
+    RefTableManager.add_datapoint()
 
     print(f"Time elapsed: {end - start} seconds")
 

@@ -11,6 +11,9 @@ csv_path = "data.csv"
 csv_path2 = "data_refT.csv"
 df = pd.read_csv(csv_path, encoding_errors='ignore')
 df_model = pd.read_csv(csv_path2)
+columns = [
+    'Title', 'Tempo', 'SR x .5', 'SR x 1', 'SR x 2', 'Onset SR x 1', '60 Window', 'beat len', 'DTF1', 'DTF2'
+]
 
 
 def view_reference_table():
@@ -58,10 +61,15 @@ def saveTable():
     df_model.to_csv(csv_path2, index=False)
 
 
+def saveData():
+    df.to_csv(csv_path, index=False)
+
+
 def add_datapoint():
     #     Checks if a song name is already in data.cvs
     #      if not, get its vector, then allow the user to set it's tempo
     paths, names = SystemManager.pullPaths()
+    temp = pd.DataFrame(columns=columns)
     for i in range(len(names)):
         x = ((names[i])[4:16]).encode('ascii', errors='replace').decode('ascii')
         found = df[df['Title'].str.contains(x, regex=False)]
@@ -69,20 +77,33 @@ def add_datapoint():
             print("Not Found \n" + names[i])
             vector, y, sr = TempoEstimator.getTempoVector(paths[i])
             print(vector)
-            # new_row = pd.DataFrame([{'Tempo': 0,
-            #                          'SR x .5': (vector[0]),
-            #                          'SR x 1': (vector[]),
-            #                          'SR x 2': (current_group['SR x 2'].mode()[0]),
-            #                          'Onset SR x 1': (current_group['Onset SR x 1'].mode()[0]),
-            #                          '60 Window': (current_group['60 Window'].mode()[0]),
-            #                          'beat len': (current_group['beat len'].mode()[0]),
-            #                          'DTF1': (current_group['DTF1'].mode()[0]),
-            #                          'DTF2': (current_group['DTF2'].mode()[0]
-            #                              }])
+            tempo = input("tempo: ")
+            new_row = [
+                names[i],
+                int(tempo),
+                vector[1],
+                vector[2],
+                vector[3],
+                vector[4],
+                vector[5],
+                vector[6],
+                vector[7],
+                vector[8]
+            ]
 
+            temp.loc[len(temp)] = new_row
+            print(temp.iloc[-1])
+            # df.loc[len(df)] = new_row
+            # print(df.loc[len(df) - 1])
 
+            x = input("Looks good?\n1. Yes\n2. NO!!!!!\n")
+            if x != '1':
+                temp.iat[-1, 1] = 0
+            print((names[i]) + " was added")
+            df.loc[len(df)] = new_row
+            saveData()
 
-
+    print("new songs added-->\n" + temp)
 
 
 def add_referenceRow(new_row):

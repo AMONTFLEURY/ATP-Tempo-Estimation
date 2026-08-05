@@ -223,6 +223,7 @@ def checkBeatTiming(path, estimated_tempo, tempo2):
 #     base[i].append(arg)
 
 
+#
 def crossChecker(array, dummy, weight=2):
     weight = -weight
     if array[3] < 0:

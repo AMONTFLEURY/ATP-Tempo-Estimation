@@ -114,6 +114,11 @@ def getAllVectors(cores):
     return frame
 
 
+def crossEstimate(index):
+    print(songList[index])
+    TempoEstimator.cross_estimation(pathList[index])
+
+
 def EstimateFromDTA(index):
     print(TempoEstimator.DynamicTempoAlgo(pathList[index]))
 
@@ -204,7 +209,8 @@ def tempo_estimator_screen():
         if choice == "3":
             pass
         if choice == "4":
-            pass
+            index = input("index:")
+            crossEstimate(index)
         if choice == "0":
             break
 
@@ -276,13 +282,13 @@ if __name__ == "__main__":
     # ModelTrainer.saveTable()
 
     # getAllVectors(16)
-    end = time.time()
     # RefTableManager.create_RTable_from_list()
     # RefTableManager.add_datapoint()
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
-    # Interface()
-    RefTableManager.add_datapoint()
+    Interface()
+    # RefTableManager.add_datapoint()
+    end = time.time()
 
     print(f"Time elapsed: {end - start} seconds")
 

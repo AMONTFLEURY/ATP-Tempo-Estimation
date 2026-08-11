@@ -99,9 +99,12 @@ def add_datapoint():
             x = input("Looks good?\n1. Yes\n2. NO!!!!!\n")
             if x != '1':
                 temp.iat[-1, 1] = 0
+            if x == 'x':
+                break
             print((names[i]) + " was added")
             df.loc[len(df)] = new_row
             saveData()
+
 
     print("new songs added-->\n" + temp)
 
@@ -115,17 +118,16 @@ def add_referenceRow(new_row):
 def get_table_slices(estimated_tempo, scope=10):
     floor = estimated_tempo - scope
     ceiling = estimated_tempo + scope
-    df_slice1 = df[df['Tempo'].between(floor, ceiling)]
-    if estimated_tempo <= 70 or estimated_tempo > 130:
+    df_slice1 = df_model[df_model['Tempo'].between(floor, ceiling)]
+    if estimated_tempo <= 85 or estimated_tempo > 130:
         if estimated_tempo > 130:
             estimated_tempo = estimated_tempo / 2
         else:
             estimated_tempo = estimated_tempo * 2
-        estimated_tempo = estimated_tempo * 2
-        math.floor(estimated_tempo)
+        estimated_tempo = math.floor(estimated_tempo)
         floor = estimated_tempo - scope
         ceiling = estimated_tempo + scope
-        df_slice2 = df[df['Tempo'].between(floor, ceiling)]
+        df_slice2 = df_model[df_model['Tempo'].between(floor, ceiling)]
     else:
         df_slice2 = None
 

@@ -85,38 +85,22 @@ def getAllVectors(cores):
             frame.append(result[0])
             print(len(frame), "out of", len(songList))
             print(result[0])
-    # for i in frame:
-    #     print(i[1])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[2])
-    # print('---------------------------------------------')
-    #
-    # for i in frame:
-    #     print(i[3])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[4])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[5])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[6])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[7])
-    # print('---------------------------------------------')
-    # for i in frame:
-    #     print(i[8])
-    # print('---------------------------------------------')
 
     return frame
 
 
 def crossEstimate(index):
     print(songList[index])
-    TempoEstimator.cross_estimation(pathList[index])
+    x, found = UDManager.check_for_index(songList[index])
+    if not found:
+        vector = TempoEstimator.cross_estimation(pathList[index])
+        new = [index, songList[index] , vector]
+        loaded_songs.append(new)
+        UDManager.add_row(loaded_songs[-1])
+    else:
+        print(UDManager.check_for_index(songList[index]))
+        x, y = UDManager.check_for_index(songList[index])
+        return x.iloc[0,2]
 
 
 def EstimateFromDTA(index):
@@ -147,6 +131,7 @@ def search_song():
 
 def nextButton():
     input("Press Enter to Continue")
+    clear_screen()
 
 
 def date_management_screen():
@@ -158,7 +143,7 @@ def date_management_screen():
     4. Print Model Data
     5. Print Training Data
     6. Back
-        """)
+>: """)
         if choice == "1":
             UDManager.saveTable()
         if choice == "2":
@@ -176,16 +161,14 @@ def date_management_screen():
 def debug_screen():
     while True:
         choice = input("""
-        1. Add New Data Points
-        2. Train Model
-        3. Add to data csv
-        4. 
-        """)
+    1. Add New Data Points
+    2. Train Model
+>: """)
         if choice == '1':
             # x = input("index: ")
             RefTableManager.add_datapoint()
-        elif choice == '3':
-            pass
+        elif choice == '2':
+            RefTableManager.create_RTable_from_list()
 
         else:
             break
@@ -194,30 +177,49 @@ def debug_screen():
 def tempo_estimator_screen():
     while True:
         choice = input("""
-        1. Get all Tempo Vectors
-        2. Get Single Tempo Vector
-        3. Estimate All Tempos
-        4. Estimate Single Tempo
-        0. Exit
-        """)
+1. Get all Tempo Vectors
+2. Get Single Tempo Vector
+3. Estimate All Tempos
+4. Estimate Single Tempo
+5. Test with 'UNBEATABLE'
+0. Exit
+>: """)
         if choice == "1":
             cores = input(f"Number of cores (1 - {SystemManager.getCPUcount()}):")
             getAllVectors(int(cores))
-        if choice == "2":
+        elif choice == "2":
             index = input("index:")
             getVector(int(index))
-        if choice == "3":
+            nextButton()
+        elif choice == "3":
             pass
-        if choice == "4":
+        elif choice == "4":
             index = input("index:")
-            crossEstimate(index)
-        if choice == "0":
+            crossEstimate(int(index))
+            nextButton()
+        elif choice == "5":
+            index = input("index:")
+            SystemManager.edit_beat_map(crossEstimate(int(index)),'')
+        elif choice == "0":
             break
 
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     # print("\n" * 100)
+def CD_screen():
+    clear_screen()
+    choice = input("""
+Change Directory of ?:
+1.  User Music
+2. 'UNBEATABLE' Test Beat Map
+3.  Reset
+>:
+""")
+    choice = choice.lower()
+    if choice == "1":
+        path_loc = input("path to music folder\n>:")
+        SystemManager.music_dir = path_loc
 
 
 def Interface():
@@ -228,31 +230,26 @@ def Interface():
 
     while True:
         clear_screen()
-        choice = input(f"""
-        
-        
-        
-    CPU Core count: {SystemManager.getCPUcount()},\
-    Song List Length: {len(songList)}
-    1. Tempo Estimator
-    2. Search
-    3. List of all songs
-    4. -----------------
-    5. Get loaded songs
-    6. Verify Files 
-    7. Data Manager
-    8. Debug
-    :
-    """)
+        choice = input(f"""  
+CPU Core count: {SystemManager.getCPUcount()},\n
+Song List Length: {len(songList)}
+1. Tempo Estimator
+2. Search
+3. List of all songs
+4. Change Dir
+5. Get loaded songs
+6. Verify Files 
+7. Data Manager
+8. Debug
+>: """)
         if choice == "1":
             tempo_estimator_screen()
         elif choice == '2':
-
             search(input("name : "))
         elif choice == '3':
             getSongList()
         elif choice == '4':
-            pass
+            CD_screen()
         elif choice == '5':
             getLoaded()
         elif choice == '6':
@@ -286,7 +283,8 @@ if __name__ == "__main__":
     # RefTableManager.add_datapoint()
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
-    Interface()
+    # Interface()
+    crossEstimate(120)
     # RefTableManager.add_datapoint()
     end = time.time()
 

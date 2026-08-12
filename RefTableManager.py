@@ -35,7 +35,8 @@ def create_RTable_from_list():
     # group all tempos
     # get mode for each col from group
     # save to data_refT
-    temp = df_model
+    temp = pd.DataFrame(columns=columns)
+    temp = temp.drop(columns=['Title'])
     df2 = df.drop(columns=['Title'])
     for i in range(df2['Tempo'].min(), df2['Tempo'].max()):
         current_group = df2.loc[df2['Tempo'] == i]
@@ -54,7 +55,7 @@ def create_RTable_from_list():
             print(new_row.to_string(), "\n")
             temp = pd.concat([temp, new_row])
     print(temp)
-    # temp.to_csv(csv_path2, index=False)
+    temp.to_csv(csv_path2, index=False)
 
 
 def saveTable():

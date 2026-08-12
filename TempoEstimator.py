@@ -350,7 +350,7 @@ def combinedAlgo(path_list):
 
 def cross_finder(vector, slice):
     cur_score = 0
-    current_tempo = slice.iloc[0][0]
+    current_tempo = slice.iloc[0,0]
     round_bias = "up"
     for row in slice.itertuples():
         score = 0
@@ -382,16 +382,19 @@ def cross_finder(vector, slice):
 
 def cross_checker(vector):
     # print(test_vector.iloc[0, 5], type(test_vector.iloc[0, 5]))
+    tempo1 = None
     slice1, slice2 = RefTableManager.get_table_slices(estimated_tempo=vector[1], )
-    print(type(slice1))
-    print(type(slice2))
     tempo0, score0, round_bias0 = cross_finder(vector, slice1)
-    print(tempo0, score0)
     if slice2 is not None:
         tempo1, score1, round_bias1 = cross_finder(vector, slice1)
-        print(tempo1, score1)
-
+    return tempo0, tempo1, round_bias0
 
 def cross_estimation(path):
     vector, y, sr = getTempoVector(path)
-    cross_checker(vector)
+    tempo0, tempo1, round_bias0 = cross_checker(vector)
+    if tempo1 is not None:
+        print("Estimated tempo:", tempo0, "with a double/half time of: ", tempo1)
+    else:
+        print("Estimated tempo:", tempo0)
+    vector[0] = tempo0
+    return vector[0]

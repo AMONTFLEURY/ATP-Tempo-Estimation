@@ -19,10 +19,10 @@ Unbeatable_dir = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/Custom
 def pullPaths():
     songPaths = []
     songNames = []
-    fileScanner = os.scandir(music_dir)
+    fileScanner = os.scandir("Music2")
     for files in fileScanner:
         fileName = files
-        songPaths.append(music_dir + (fileName.__str__())[11:-2])
+        songPaths.append(music_dir+"/" + (fileName.__str__())[11:-2])
         songName = ((fileName.__str__())[11:-2])
         songName = songName.replace(" (SPOTISAVER)", "")
         songName = songName.replace(".mp3", "")

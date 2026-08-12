@@ -303,6 +303,7 @@ def getTempoVectorMP(path):
 
 
 def getTempoVector(path):
+    print(path)
     y, sr = librosa.load(path, sr=None, mono=True)
     vector = [0]
     vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.5))

@@ -94,13 +94,23 @@ def crossEstimate(index):
     x, found = UDManager.check_for_index(songList[index])
     if not found:
         vector = TempoEstimator.cross_estimation(pathList[index])
-        new = [index, songList[index] , vector]
+        new = [index, songList[index], vector]
         loaded_songs.append(new)
         UDManager.add_row(loaded_songs[-1])
     else:
         print(UDManager.check_for_index(songList[index]))
         x, y = UDManager.check_for_index(songList[index])
-        return x.iloc[0,2]
+        return x.iloc[0, 2]
+
+
+def crossEstimate_all(cores):
+    frame1 = []
+    with Pool(cores) as p:
+        for result in p.map(crossEstimate, range(0, len(songList))):
+            frame1.append(result[0])
+            print(len(frame1), "out of", len(songList))
+            print(result[0])
+    print(frame1)
 
 
 def EstimateFromDTA(index):
@@ -192,14 +202,15 @@ def tempo_estimator_screen():
             getVector(int(index))
             nextButton()
         elif choice == "3":
-            pass
+            crossEstimate_all(input("Cores?\n::"))
+            nextButton()
         elif choice == "4":
             index = input("index:")
             crossEstimate(int(index))
             nextButton()
         elif choice == "5":
             index = input("index:")
-            SystemManager.edit_beat_map(crossEstimate(int(index)),'')
+            SystemManager.edit_beat_map(crossEstimate(int(index)), '')
         elif choice == "0":
             break
 
@@ -207,6 +218,8 @@ def tempo_estimator_screen():
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     # print("\n" * 100)
+
+
 def CD_screen():
     clear_screen()
     choice = input("""
@@ -284,7 +297,7 @@ if __name__ == "__main__":
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
     # Interface()
-    crossEstimate(120)
+    crossEstimate(130)
     # RefTableManager.add_datapoint()
     end = time.time()
 

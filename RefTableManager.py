@@ -29,6 +29,7 @@ def song_lookup(name=''):
     print(found)
 
 
+# Creates and saves A new reference table based on data.csv
 def create_RTable_from_list():
     # drop title
     # loop from min tempo -> max tempo
@@ -63,7 +64,7 @@ def saveTable():
 
 
 def saveData():
-    df.to_csv(csv_path, index=False)
+    df.sort_values(by='Tempo').to_csv(csv_path, index=False)
 
 
 def add_datapoint():
@@ -106,7 +107,6 @@ def add_datapoint():
             df.loc[len(df)] = new_row
             saveData()
 
-
     print("new songs added-->\n" + temp)
 
 
@@ -116,6 +116,7 @@ def add_referenceRow(new_row):
     print(df)
 
 
+# Cuts reference table into scope x 2 length for faster iteration
 def get_table_slices(estimated_tempo, scope=10):
     floor = estimated_tempo - scope
     ceiling = estimated_tempo + scope
@@ -133,3 +134,28 @@ def get_table_slices(estimated_tempo, scope=10):
         df_slice2 = None
 
     return df_slice1, df_slice2
+
+
+def make_data(frames, songs):
+    temp = pd.DataFrame(columns=columns)
+    for i in range(len(songs)):
+        print((songs[i]).encode('ascii', errors='replace').decode('ascii'))
+        encoded_name = (songs[i]).encode('ascii', errors='replace').decode('ascii')
+        filtered = df[df['Title'] == (encoded_name)]
+        # print(filtered)
+        if len(filtered) > 0:
+            new_row = [encoded_name, filtered.iat[0, 1]]
+        else:
+            new_row = [encoded_name, 0]
+        for j in range(1, len(frames[i])):
+            new_row.append(frames[i][j])
+        # print(new_row)
+        temp.loc[len(temp)] = new_row
+    print(temp)
+    temp.sort_values(by='Title').to_csv("Book1 no touch.csv", index=False)
+
+
+def check_for_index(title):
+    if 1 <= (df['Title'] == title).sum():
+        # print(df[df['Title'] == title].to_string())
+        return df[df['Title'] == title], True

@@ -7,6 +7,7 @@ from numba.cuda.libdeviceimpl import args
 from numpy import dtype
 
 import RefTableManager
+import RoundChecker
 import TempoGetter
 from multiprocessing import Pool, Queue
 import SystemManager
@@ -302,8 +303,8 @@ def getTempoVectorMP(path):
     return vectorU
 
 
+# Get sampling vectors form librosa, Compute heavy
 def getTempoVector(path):
-    print(path)
     y, sr = librosa.load(path, sr=None, mono=True)
     vector = [0]
     vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.5))
@@ -315,9 +316,6 @@ def getTempoVector(path):
     x1, x2 = TempoGetter.Tempo_TimeFrame(path=path)
     vector.append(x1)
     vector.append(x2)
-
-    # vector.append(DynamicTempoAlgo(path, y, sr))
-    # vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.33))
 
     holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y, sr)
     vector.append(holder[tempo1][1])
@@ -349,9 +347,11 @@ def combinedAlgo(path_list):
 #     pass
 
 
+# searches for best match in reference slice by evaluating each reference point,
+# then picking the point with the best score, only exact matches give points
 def cross_finder(vector, slice):
     cur_score = 0
-    current_tempo = slice.iloc[0,0]
+    current_tempo = slice.iloc[0, 0]
     round_bias = "up"
     for row in slice.itertuples():
         score = 0
@@ -369,33 +369,50 @@ def cross_finder(vector, slice):
             score += 1.2
         if row.DTF1 == vector[7]:
             score += 1
+        # Could be Removed
+        if row._4 == vector[3]:
+            score += .2
         if row.DTF2 == vector[8]:
             score += 1
         if cur_score <= score:
+            # If the winning score is giving to the wrong Tempo,
+            # the algo knows that it must be the previous Tempo or between
+            # Better way of doing rounding checks
             if cur_score == score and score != 0:
                 round_bias = "down"
             current_tempo = row.Tempo
             cur_score = score
-
-    # print(current_tempo, cur_score)
     return current_tempo, cur_score, round_bias
 
 
+# Take sample vector, to estimate tempo,
+# Heart of algorithm
 def cross_checker(vector):
-    # print(test_vector.iloc[0, 5], type(test_vector.iloc[0, 5]))
-    tempo1 = None
-    slice1, slice2 = RefTableManager.get_table_slices(estimated_tempo=vector[1], )
-    tempo0, score0, round_bias0 = cross_finder(vector, slice1)
-    if slice2 is not None:
+    tempo1, score1 = None, None
+    slice0, slice1 = RefTableManager.get_table_slices(estimated_tempo=vector[1])
+    # print(type(slice0), type(slice1))
+    tempo0, score0, round_bias0 = cross_finder(vector, slice0)
+    if slice1 is not None:
         tempo1, score1, round_bias1 = cross_finder(vector, slice1)
-    return tempo0, tempo1, round_bias0
+    return [tempo0, tempo1], [score0, score1], round_bias0
 
+
+# I/O for Algorithm
 def cross_estimation(path):
     vector, y, sr = getTempoVector(path)
-    tempo0, tempo1, round_bias0 = cross_checker(vector)
-    if tempo1 is not None:
-        print("Estimated tempo:", tempo0, "with a double/half time of: ", tempo1)
+    tempo, score, round_bias0 = cross_checker(vector)
+
+    if tempo[1] is not None and tempo[0] is not tempo[1]:
+        tempo = RoundChecker.check(tempo, score, round_bias0)
+        if tempo[0] is None:
+            tempo[0] = tempo[1]
+        message = (
+            f"Estimated tempo: {tempo[0]} with a double/half time of: {tempo[1]}"
+            f"\nScore 1: {score[0]}"
+            f"\nScore 2: {score[1]}")
     else:
-        print("Estimated tempo:", tempo0)
-    vector[0] = tempo0
-    return vector[0]
+        message = (f"Estimated tempo: {tempo[0]}"
+                   f"\nScore 1: {score[0]}")
+    # print('\n')
+    vector[0] = tempo[0]
+    return vector, message

@@ -85,32 +85,54 @@ def getAllVectors(cores):
             frame.append(result[0])
             print(len(frame), "out of", len(songList))
             print(result[0])
-
-    return frame
+    # RefTableManager.make_data(frame, songList)
+    # for col in range(len(frame[0])):
+    #     print("\n\ncol:", col)
+    #     for row in range(len(frame)):
+    #         print(frame[row][col])
+    # return frame
 
 
 def crossEstimate(index):
-    print(songList[index])
-    x, found = UDManager.check_for_index(songList[index])
-    if not found:
-        vector = TempoEstimator.cross_estimation(pathList[index])
-        new = [index, songList[index], vector]
-        loaded_songs.append(new)
-        UDManager.add_row(loaded_songs[-1])
+    if type(index) == int:
+        print(songList[index])
+        x, found = UDManager.check_for_index(songList[index])
+        if not found:
+            vector, message = TempoEstimator.cross_estimation(pathList[index])
+            new = [index, songList[index], vector[0]]
+            loaded_songs.append(new)
+            UDManager.add_row(loaded_songs[-1], vector_for_data=vector)
+            print(message)
+
+        else:
+            # print(UDManager.check_for_index(songList[index]))
+            # x, y = UDManager.check_for_index(songList[index])
+            return x.to_string()
     else:
-        print(UDManager.check_for_index(songList[index]))
-        x, y = UDManager.check_for_index(songList[index])
-        return x.iloc[0, 2]
+        # print(SystemManager.get_song_name(index))
+        x, found = UDManager.check_for_index(index)
+        if not found:
+            vector, message = TempoEstimator.cross_estimation(index)
+            new = [index, index, vector[0]]
+            loaded_songs.append(new)
+            UDManager.add_row(loaded_songs[-1], vector_for_data=vector)
+            return message
+        else:
+            # print(UDManager.check_for_index(songList[index]))
+            # x, y = UDManager.check_for_index(songList[index])
+            return x.to_string()
 
 
 def crossEstimate_all(cores):
     frame1 = []
     with Pool(cores) as p:
-        for result in p.map(crossEstimate, range(0, len(songList))):
-            frame1.append(result[0])
-            print(len(frame1), "out of", len(songList))
-            print(result[0])
-    print(frame1)
+        for result in p.map(crossEstimate, pathList):
+            frame1.append(result)
+            print(len(frame1), "out of", len(songList), " Track: ", songList[len(frame1)-1] )
+            # print(result[-1])
+    for i in range(len(frame1)):
+        print(songList[i])
+        print(frame1[i], '\n')
 
 
 def EstimateFromDTA(index):
@@ -297,9 +319,19 @@ if __name__ == "__main__":
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
     # Interface()
-    crossEstimate(130)
+    getSongList()
+
+    # SystemManager.Reorder_data()
+    # print(getAllVectors(12))
+    # UDManager.saveTable()
     # RefTableManager.add_datapoint()
+    RefTableManager.create_RTable_from_list()
+    crossEstimate_all(8)
+    # (crossEstimate(-1))
+    # (crossEstimate(-3))
+
     end = time.time()
+
 
     print(f"Time elapsed: {end - start} seconds")
 

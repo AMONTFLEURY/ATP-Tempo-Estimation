@@ -7,22 +7,26 @@ import json
 import re
 import pandas as pd
 
+import RefTableManager
+import UDManager
+
 H_res = 1920
 V_res = 1080
 gameRate = 240
 frameRate = 120
 music_dir_default = "Music2"
-music_dir = "Music2"
+music_dir = "Music_Test Group"
+# music_dir = "Music2"
 Unbeatable_dir = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/CustomSongs/ATPTEST/ATP - TEST () [Easy].txt"
 
 
 def pullPaths():
     songPaths = []
     songNames = []
-    fileScanner = os.scandir("Music2")
+    fileScanner = os.scandir(music_dir)
     for files in fileScanner:
         fileName = files
-        songPaths.append(music_dir+"/" + (fileName.__str__())[11:-2])
+        songPaths.append(music_dir + "/" + (fileName.__str__())[11:-2])
         songName = ((fileName.__str__())[11:-2])
         songName = songName.replace(" (SPOTISAVER)", "")
         songName = songName.replace(".mp3", "")
@@ -31,10 +35,22 @@ def pullPaths():
     return songPaths, songNames
 
 
+def get_song_name(songName):
+    songName = songName.replace(music_dir + "/", "")
+    songName = songName.replace(" (SPOTISAVER)", "")
+    songName = songName.replace(".mp3", "")
+    return songName
+
+
 def checkFiles():
     files = os.scandir()
     for i in files:
         print(i)
+
+
+def Reorder_data():
+    UDManager.saveTable()
+    RefTableManager.saveData()
 
 
 def getCPUcount():

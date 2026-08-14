@@ -325,8 +325,8 @@ if __name__ == "__main__":
     # print(getAllVectors(12))
     # UDManager.saveTable()
     # RefTableManager.add_datapoint()
-    RefTableManager.create_RTable_from_list()
-    crossEstimate_all(8)
+    # RefTableManager.create_RTable_from_list()
+    crossEstimate_all(16)
     # (crossEstimate(-1))
     # (crossEstimate(-3))
 

@@ -95,7 +95,7 @@ def getAllVectors(cores):
 
 def crossEstimate(index):
     if type(index) == int:
-        print(songList[index])
+        # print(songList[index])
         x, found = UDManager.check_for_index(songList[index])
         if not found:
             vector, message = TempoEstimator.cross_estimation(pathList[index])
@@ -103,6 +103,11 @@ def crossEstimate(index):
             loaded_songs.append(new)
             UDManager.add_row(loaded_songs[-1], vector_for_data=vector)
             print(message)
+            stringX = songList[index] + ", 97"
+            for i in range(1,len(vector)):
+                stringX += ", " + str(vector[i])
+            print(stringX)
+
 
         else:
             # print(UDManager.check_for_index(songList[index]))
@@ -325,13 +330,24 @@ if __name__ == "__main__":
     # print(getAllVectors(12))
     # UDManager.saveTable()
     # RefTableManager.add_datapoint()
-    # RefTableManager.create_RTable_from_list()
+    RefTableManager.create_RTable_from_list()
     # crossEstimate_all(10)
-    (crossEstimate(16))
-    # (crossEstimate(0))
+    # (crossEstimate(16))
+    # (crossEstimate(12))
+    #
+    # (crossEstimate(13))
+    #
+    # (crossEstimate(14))
+    # (crossEstimate(15))
+    # (crossEstimate(16))
+    # print(crossEstimate(20))
+    # for i in range(3,7):
+    #     crossEstimate(i)
+    # for i in range(0,17):
+    #     crossEstimate(i)
     # (crossEstimate(1))
-    # (crossEstimate(2))
-    # (crossEstimate(-10))
+    # (crossEstimate(12))
+    # (crossEstimate(-1))
     end = time.time()
 
 

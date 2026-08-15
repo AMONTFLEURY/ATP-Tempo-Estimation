@@ -320,6 +320,7 @@ def getTempoVector(path):
     holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y, sr)
     vector.append(holder[tempo1][1])
     vector.append(holder[tempo2][1])
+    print(vector)
 
     return vector, y, sr
 
@@ -401,16 +402,17 @@ def cross_checker(vector):
 def cross_estimation(path):
     vector, y, sr = getTempoVector(path)
     tempo, score, round_bias0 = cross_checker(vector)
+    tempo = RoundChecker.check(tempo, score, round_bias0)
 
-    if tempo[1] is not None and tempo[0] is not tempo[1]:
-        tempo = RoundChecker.check(tempo, score, round_bias0)
-        if tempo[0] is None:
+    if tempo[1] is not None and tempo[0] == tempo[1]:
+        if tempo[0] is None and tempo[0] != tempo[1]:
             tempo[0] = tempo[1]
         message = (
             f"Estimated tempo: {tempo[0]} with a double/half time of: {tempo[1]}"
             f"\nScore 1: {score[0]}"
             f"\nScore 2: {score[1]}")
     else:
+        RoundChecker.rolling_star(score, tempo)
         message = (f"Estimated tempo: {tempo[0]}"
                    f"\nScore 1: {score[0]}")
     # print('\n')

@@ -117,7 +117,7 @@ def add_referenceRow(new_row):
 
 
 # Cuts reference table into scope x 2 length for faster iteration
-def get_table_slices(estimated_tempo, scope=10):
+def get_table_slices(estimated_tempo, scope=11):
     floor = estimated_tempo - scope
     ceiling = estimated_tempo + scope
     df_slice1 = df_model[df_model['Tempo'].between(floor, ceiling)]
@@ -131,8 +131,9 @@ def get_table_slices(estimated_tempo, scope=10):
         ceiling = estimated_tempo + scope
         df_slice2 = df_model[df_model['Tempo'].between(floor, ceiling)]
     else:
-        df_slice2 = None
-
+        floor = floor - scope
+        ceiling = ceiling * 1.2
+        df_slice2 = df_model[df_model['Tempo'].between(floor, ceiling)]
     return df_slice1, df_slice2
 
 

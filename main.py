@@ -126,7 +126,7 @@ def crossEstimate(index):
 def crossEstimate_all(cores):
     frame1 = []
     with Pool(cores) as p:
-        for result in p.map(crossEstimate, pathList):
+        for result in p.imap(crossEstimate, pathList):
             frame1.append(result)
             print(len(frame1), "out of", len(songList), " Track: ", songList[len(frame1)-1] )
             # print(result[-1])
@@ -318,18 +318,20 @@ if __name__ == "__main__":
     # RefTableManager.add_datapoint()
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
+    # getSongList()
     # Interface()
-    getSongList()
 
     # SystemManager.Reorder_data()
     # print(getAllVectors(12))
     # UDManager.saveTable()
     # RefTableManager.add_datapoint()
     # RefTableManager.create_RTable_from_list()
-    crossEstimate_all(16)
-    # (crossEstimate(-1))
-    # (crossEstimate(-3))
-
+    # crossEstimate_all(10)
+    (crossEstimate(16))
+    # (crossEstimate(0))
+    # (crossEstimate(1))
+    # (crossEstimate(2))
+    # (crossEstimate(-10))
     end = time.time()
 
 

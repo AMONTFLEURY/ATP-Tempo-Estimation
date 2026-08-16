@@ -98,24 +98,24 @@ def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
 
     # each cell of the holder includes [Initial/Starting Tempo, Mode, Average Deviation]
     holder = []
-    starting_tempo = starting_tempo - 10
-    increment = 1
-    tempo1 = 0
+    starting_tempo = 40
+    increment = 5
+    tempo1, tempo2, tempo3 = 0, 0, 1
 
     # intailizing the holder array for the while loop to work
     dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False, sr_multiplier=1,
-                                                 starting_tempo=starting_tempo, interval=200)
+                                                             starting_tempo=starting_tempo, interval=200)
     # Gets average deviation
     avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
     # just to get the mode
     mode = stats.mode(dynam_tempo_array0)
     holder.append([starting_tempo, mode, avg_dev0])
     # While start
-    while tempo1 == 0:
+    while tempo1 == 0 or tempo2 == 0 or tempo3 == 0:
         starting_tempo += increment
         dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False,
-                                                     sr_multiplier=0.5,
-                                                     starting_tempo=starting_tempo, interval=200)
+                                                                 sr_multiplier=0.5,
+                                                                 starting_tempo=starting_tempo, interval=200)
         avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
         mode = stats.mode(dynam_tempo_array0)
         holder.append([starting_tempo, mode, avg_dev0])
@@ -123,8 +123,18 @@ def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
         # Checks if the latest holder in the cell is greater than the previous
         # if it is then the previous cell has the is at the lowest point and
         # that index will be stored,
-        if holder[-1][2] > holder[-2][2]:
-            return holder[-1]
+        if holder[-1][2] > holder[-2][2] and holder[-1][0] - holder[tempo1][0] > 10:
+            if tempo1 == 0:
+                tempo1 = len(holder) - 2
+                starting_tempo += 15
+            elif tempo2 == 0:
+                if holder[-1][0] - holder[tempo1][0] - 20 > 15:
+                    tempo2 = len(holder) - 2
+                    starting_tempo += 15
+            # else:
+            #     if holder[-1][0] - holder[tempo2][0] - 20 > 15:
+            #         tempo3 = len(holder) - 2
+    return holder, tempo1, tempo2, tempo3
 
 
 def Tempo_TimeFrame(path="", y=None, sr=None, starting_tempo=120, frame_len = 120):

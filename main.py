@@ -9,7 +9,6 @@ import TempoEstimator
 import TempoGetter
 import RefTableManager
 import os
-import TempoTable
 import UDManager
 import pandas as pd
 
@@ -95,7 +94,7 @@ def getAllVectors(cores):
 
 def crossEstimate(index):
     if type(index) == int:
-        # print(songList[index])
+        print(songList[index])
         x, found = UDManager.check_for_index(songList[index])
         if not found:
             vector, message = TempoEstimator.cross_estimation(pathList[index])
@@ -103,10 +102,10 @@ def crossEstimate(index):
             loaded_songs.append(new)
             UDManager.add_row(loaded_songs[-1], vector_for_data=vector)
             print(message)
-            stringX = songList[index] + ", 97"
-            for i in range(1,len(vector)):
-                stringX += ", " + str(vector[i])
-            print(stringX)
+            # stringX = songList[index] + ", 97"
+            # for i in range(1,len(vector)):
+            #     stringX += ", " + str(vector[i])
+            # print(stringX)
 
 
         else:
@@ -114,7 +113,7 @@ def crossEstimate(index):
             # x, y = UDManager.check_for_index(songList[index])
             return x.to_string()
     else:
-        # print(SystemManager.get_song_name(index))
+        print(SystemManager.get_song_name(index))
         x, found = UDManager.check_for_index(index)
         if not found:
             vector, message = TempoEstimator.cross_estimation(index)
@@ -133,7 +132,7 @@ def crossEstimate_all(cores):
     with Pool(cores) as p:
         for result in p.imap(crossEstimate, pathList):
             frame1.append(result)
-            print(len(frame1), "out of", len(songList), " Track: ", songList[len(frame1)-1] )
+            # print(len(frame1), "out of", len(songList), " Track: ", songList[len(frame1)-1] )
             # print(result[-1])
     for i in range(len(frame1)):
         print(songList[i])
@@ -323,28 +322,28 @@ if __name__ == "__main__":
     # RefTableManager.add_datapoint()
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
-    # getSongList()
+    getSongList()
     # Interface()
 
     # SystemManager.Reorder_data()
     # print(getAllVectors(12))
     # UDManager.saveTable()
     # RefTableManager.add_datapoint()
-    RefTableManager.create_RTable_from_list()
+    # RefTableManager.create_RTable_from_list()
     # crossEstimate_all(10)
-    # (crossEstimate(16))
-    # (crossEstimate(12))
+    # (crossEstimate(-15))
+    # (crossEstimate(-2))
     #
-    # (crossEstimate(13))
+    # (crossEstimate(23))
     #
     # (crossEstimate(14))
-    # (crossEstimate(15))
+    # # (crossEstimate(15))
     # (crossEstimate(16))
     # print(crossEstimate(20))
     # for i in range(3,7):
     #     crossEstimate(i)
-    # for i in range(0,17):
-    #     crossEstimate(i)
+    for i in range(30,37):
+        crossEstimate(i)
     # (crossEstimate(1))
     # (crossEstimate(12))
     # (crossEstimate(-1))

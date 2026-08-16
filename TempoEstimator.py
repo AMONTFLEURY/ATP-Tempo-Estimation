@@ -16,6 +16,7 @@ from sklearn.model_selection import train_test_split
 import statistics as stats
 import pandas as pd
 
+import TempoStabilityUnit
 from TempoGetter import getRawTempo
 from UDManager import df
 
@@ -87,7 +88,7 @@ def DynamicTempoAlgo(path="", y=None, sr=None):
 
 def DTA_Getter(path="", y=None, sr=None):
     # print(path)
-    if path != "":
+    if path == "":
         y, sr = librosa.load(path, mono=True, sr=None)
 
     # each cell of the holder includes [Initial/Starting Tempo, Mode, Average Deviation]
@@ -253,59 +254,17 @@ def DTA_checker(array, y, sr):
         return -9
 
 
-def process_1(y, sr, path="", q=None):
-    q.put(TempoGetter.getRawTempo(mp3Path=path, y=y, sr=sr * 0.5))
-
-
-def process_2(y, sr, path="", q=None):
-    q.put(TempoGetter.getRawTempo(mp3Path=path, y=y, sr=sr))
-
-
-def process_3(y, sr, path="", q=None):
-    q.put(TempoGetter.get_tempo_from_onset(mp3Path="", y=y, sr=sr))
-
-
-def process_4(y, sr, path="", q=None):
-    q.put(DynamicTempoAlgo(path, y, sr))
-
-
-def process_5(y, sr, path="", q=None):
-    holder, tempo1, tempo2, tempo3 = DTA_Getter(path, y, sr)
-    q.put([holder[tempo1][1], holder[tempo2][1]])
-
-
-def getTempoVectorMP(path):
-    y, sr = librosa.load(path, sr=None, mono=True)
-    q = Queue()
-    p1 = multiprocessing.Process(target=process_1, args=(y, sr, path, q))
-    p2 = multiprocessing.Process(target=process_2, args=(y, sr, path, q))
-    p3 = multiprocessing.Process(target=process_3, args=(y, sr, path, q))
-    # p4 = multiprocessing.Process(target=process_4, args=(y, sr, path, q))
-    p5 = multiprocessing.Process(target=process_5, args=(y, sr, path, q))
-
-    p1.start()
-    p2.start()
-    p3.start()
-    # p4.start()
-    p5.start()
-
-    results = []
-    for i in range(4):
-        results.append(q.get())
-
-    p1.join()
-    p2.join()
-    p3.join()
-    # p4.join()
-    p5.join()
-
-    vectorU = results
-    return vectorU
-
 
 # Get sampling vectors form librosa, Compute heavy
-def getTempoVector(path):
-    y, sr = librosa.load(path, sr=None, mono=True)
+def getTempoVector(path, chunk=None):
+    if chunk == None:
+        y, sr = librosa.load(path, sr=None, mono=True)
+    else:
+        if chunk < 0:
+            y, sr = librosa.load(path, sr=None, mono=True, duration= -chunk)
+        else:
+            y, sr = librosa.load(path, sr=None, mono=True, offset=chunk)
+
     vector = [0]
     vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr * 0.5))
     vector.append(TempoGetter.getRawTempo(path, y=y, sr=sr))
@@ -351,6 +310,7 @@ def combinedAlgo(path_list):
 # searches for best match in reference slice by evaluating each reference point,
 # then picking the point with the best score, only exact matches give points
 def cross_finder(vector, slice):
+    print(slice)
     cur_score = 0
     current_tempo = slice.iloc[0, 0]
     round_bias = "up"
@@ -390,7 +350,9 @@ def cross_finder(vector, slice):
 # Heart of algorithm
 def cross_checker(vector):
     tempo1, score1 = None, None
-    slice0, slice1 = RefTableManager.get_table_slices(estimated_tempo=vector[1])
+    estimated_tempo = TempoStabilityUnit.slice_correcter([vector[1], vector[2], vector[3]])
+    # if estimated_tempo
+    slice0, slice1 = RefTableManager.get_table_slices(estimated_tempo)
     # print(type(slice0), type(slice1))
     tempo0, score0, round_bias0 = cross_finder(vector, slice0)
     if slice1 is not None:
@@ -400,10 +362,13 @@ def cross_checker(vector):
 
 # I/O for Algorithm
 def cross_estimation(path):
+    print(path)
     vector, y, sr = getTempoVector(path)
     tempo, score, round_bias0 = cross_checker(vector)
     tempo = RoundChecker.check(tempo, score, round_bias0)
-
+    if sum(score) < 5:
+        print("Checking for stability... ->", path)
+        tempo[0], score[0] = TempoStabilityUnit.stability_check(y, sr, path, tempo)
     if tempo[1] is None or tempo[0] is None:
         if tempo[0] is None:
             tempo[0] = tempo[1]

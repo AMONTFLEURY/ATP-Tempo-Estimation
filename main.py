@@ -336,14 +336,14 @@ if __name__ == "__main__":
     #
     # (crossEstimate(23))
     #
-    # (crossEstimate(14))
+    (crossEstimate(11))
     # # (crossEstimate(15))
     # (crossEstimate(16))
     # print(crossEstimate(20))
     # for i in range(3,7):
     #     crossEstimate(i)
-    for i in range(30,37):
-        crossEstimate(i)
+    # for i in range(len(songList)):
+    #     crossEstimate(i)
     # (crossEstimate(1))
     # (crossEstimate(12))
     # (crossEstimate(-1))

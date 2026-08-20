@@ -75,6 +75,9 @@ def get_Dtempo(mp3Path="", onset=False, sr_multiplier=1.0, interval=300, y=None,
     return dynamicTempoArray, dTempo
 
 
+
+
+
 def get_tempo_from_onset(mp3Path, sr_multiplier=1.0, y=None, sr=None, tempo=120):
     if y is None:
         y, sr = librosa.load(mp3Path, sr=None, mono=True)
@@ -104,7 +107,7 @@ def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
 
     # intailizing the holder array for the while loop to work
     dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False, sr_multiplier=1,
-                                                             starting_tempo=starting_tempo, interval=200)
+                                                 starting_tempo=starting_tempo, interval=200)
     # Gets average deviation
     avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
     # just to get the mode
@@ -114,8 +117,8 @@ def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
     while tempo1 == 0 or tempo2 == 0 or tempo3 == 0:
         starting_tempo += increment
         dynam_tempo_array0, all_dTypos0 = get_Dtempo(mp3Path=path, sr=sr, y=y, onset=False,
-                                                                 sr_multiplier=0.5,
-                                                                 starting_tempo=starting_tempo, interval=200)
+                                                     sr_multiplier=0.5,
+                                                     starting_tempo=starting_tempo, interval=200)
         avg_dev0 = SystemManager.get_average_deviation(dynam_tempo_array0)
         mode = stats.mode(dynam_tempo_array0)
         holder.append([starting_tempo, mode, avg_dev0])
@@ -137,7 +140,7 @@ def DTA_Getter(path="", y=None, sr=None, starting_tempo=120):
     return holder, tempo1, tempo2, tempo3
 
 
-def Tempo_TimeFrame(path="", y=None, sr=None, starting_tempo=120, frame_len = 120):
+def Tempo_TimeFrame(path="", y=None, sr=None, starting_tempo=120, frame_len=120):
     if sr == None:
         y, sr = librosa.load(path, sr=None, mono=True)
 
@@ -145,9 +148,7 @@ def Tempo_TimeFrame(path="", y=None, sr=None, starting_tempo=120, frame_len = 12
     beats = librosa.frames_to_time(beats, sr=sr)
     x = beats[0]
 
-
-    y, sr = librosa.load(path, offset=x, duration= frame_len, sr=None)
+    y, sr = librosa.load(path, offset=x, duration=frame_len, sr=None)
     tempo, beats = librosa.beat.beat_track(y=y, sr=sr * 1)
 
-    return float(round(tempo[0], 4)), math.floor(len(beats)/2)
-
+    return float(round(tempo[0], 4)), math.floor(len(beats) / 2)

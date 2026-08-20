@@ -118,6 +118,7 @@ def DTA_Getter(path="", y=None, sr=None):
         # Checks if the latest holder in the cell is greater than the previous
         # if it is then the previous cell has the is at the lowest point and
         # that index will be stored,
+
         if holder[-1][2] > holder[-2][2] and holder[-1][0] - holder[tempo1][0] > 10:
             if tempo1 == 0:
                 tempo1 = len(holder) - 2
@@ -126,9 +127,7 @@ def DTA_Getter(path="", y=None, sr=None):
                 if holder[-1][0] - holder[tempo1][0] - 20 > 15:
                     tempo2 = len(holder) - 2
                     starting_tempo += 15
-            # else:
-            #     if holder[-1][0] - holder[tempo2][0] - 20 > 15:
-            #         tempo3 = len(holder) - 2
+
     return holder, tempo1, tempo2, tempo3
 
 
@@ -310,7 +309,7 @@ def combinedAlgo(path_list):
 # searches for best match in reference slice by evaluating each reference point,
 # then picking the point with the best score, only exact matches give points
 def cross_finder(vector, slice):
-    print(slice)
+    # print(slice)
     cur_score = 0
     current_tempo = slice.iloc[0, 0]
     round_bias = "up"

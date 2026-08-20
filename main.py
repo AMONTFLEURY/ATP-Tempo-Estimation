@@ -322,7 +322,6 @@ if __name__ == "__main__":
     # RefTableManager.add_datapoint()
     # Work on this LATER
     # SystemManager.edit_beat_map(105, "oa")
-    getSongList()
     # Interface()
 
     # SystemManager.Reorder_data()
@@ -342,11 +341,14 @@ if __name__ == "__main__":
     # print(crossEstimate(20))
     # for i in range(3,7):
     #     crossEstimate(i)
-    for i in range(30,37):
-        crossEstimate(i)
+    # for i in range(len(songList)):
+    #     crossEstimate(i)
     # (crossEstimate(1))
-    # (crossEstimate(12))
+    (crossEstimate(14))
     # (crossEstimate(-1))
+    getSongList()
+
+    # print(TempoEstimator.DTA_Getter(pathList[2]))
     end = time.time()
 
 

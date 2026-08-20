@@ -28,7 +28,7 @@ def tempo_matrix(y, sr, path):
     tempo_matrix.append(vector)
     vector, y, sr = TempoEstimator.getTempoVector(path=path, chunk=(split + split / 3))
     tempo_matrix.append(vector)
-    # print(tempo_matrix)
+    print(tempo_matrix)
     return tempo_matrix
 
 

@@ -118,9 +118,12 @@ def add_referenceRow(new_row):
 
 # Cuts reference table into scope x 2 length for faster iteration
 def get_table_slices(estimated_tempo, scope=12):
+    if estimated_tempo < 65:
+        estimated_tempo= estimated_tempo * 2
     floor = estimated_tempo - scope
     ceiling = estimated_tempo + scope
     df_slice1 = df_model[df_model['Tempo'].between(floor, ceiling)]
+
     if estimated_tempo <= 85 or estimated_tempo > 130:
         if estimated_tempo > 130:
             estimated_tempo = estimated_tempo / 2

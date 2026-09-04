@@ -6,18 +6,16 @@ from numpy.ma.extras import average
 import json
 import re
 import pandas as pd
+import shutil
+from pathlib import Path
 
 import RefTableManager
 import UDManager
 
-H_res = 1920
-V_res = 1080
-gameRate = 240
-frameRate = 120
 music_dir_default = "Music2"
 music_dir = "Music_Test Group"
 # music_dir = "Music2"
-Unbeatable_dir = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/CustomSongs/ATPTEST/ATP - TEST () [Easy].txt"
+Unbeatable_dir = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/CustomSongs/ATPTEST/- TEST () [Beginner].txt"
 
 
 def pullPaths():
@@ -116,19 +114,37 @@ def cutLetters(string):
     return nums
 
 
+def copyfile2test(path):
+    unbeatable_folder = "C:/Users/laure/AppData/LocalLow/D-CELL GAMES/UNBEATABLE/CustomSongs/ATPTEST"
+    shutil.copy2(path, unbeatable_folder)
+
+
+def test_tempo(tempo, path):
+    copyfile2test(path)
+    songName = path.replace(music_dir + "/", "")
+    edit_beat_map(tempo, songName)
+    print(songName + "is ready for testing!")
+
+
 def edit_beat_map(new_tempo, path):
     with open(Unbeatable_dir, "r") as file:
         lines = file.readlines()
     beat_len = (round(60000 / new_tempo, 4))
+
     bls = str(beat_len)
     while len(bls) < 12:
         bls = bls + "0"
+    lines[3] = "AudioFilename: " + path + "\n"
 
     beats = 1
+    old = (re.search(r'-?\d+(?:\.\d+)?', lines[21][2:]))
+    old = old.group()
     lines[25] = "213,192," + str(beat_len * beats) + ",5,0,0:0:0:0:\n"
     lines[21] = "0," + bls + ",4,2,0,100,1,0\n"
+
     for i in range(26, len(lines) - 1):
-        lines[i] = beatmapper(lines[i], lines[25], beat_len)
+        lines[i] = beatmapper(lines[i], beat_len, (float(old)))
+
 
     with open(Unbeatable_dir, "w") as file:
         file.writelines(lines)
@@ -136,23 +152,33 @@ def edit_beat_map(new_tempo, path):
     # line[21] =
 
 
-def beatmapper(line0, base_line, bls=0.0):
+def beatmapper(line0, beat_len, old_beat_len):
+    # 298,192,
+    # Pos part of the string
     pos = line0[0:8]
+    ender = 0
+
+    # 1600,1,0,0:0:0:0:
+    # Objects
     line0 = line0.replace(pos, "")
-    timing = re.search(r'\d+', line0)
-    timing = timing.group()
-    line0 = line0.replace(timing, "")
 
-    gap = (float(timing) / bls)
-    pos_timing = pos + str(bls * gap)
-    timing2 = re.search(r'\d+', line0[7:])
-    timing2 = timing2.group()
-    if float(timing2) > 0:
-        line0 = line0[7:].replace(timing2, "")
-        pos_timing = pos_timing + "," + str(bls * (float(timing2) / bls))
+    # spacing
+    timing_0 = re.search(r'-?\d+(?:\.\d+)?', line0)
+    # ,1,0,0:0:0:0:
+    timing = (float(timing_0.group())) / old_beat_len
 
-    nextline = pos_timing + line0
-    return nextline
+    line0 = line0.replace(timing_0.group(), '')
+
+    timing = str(round(timing * beat_len))
+
+    # line0 = line0.replace(timing, "")
+    return pos + str(timing) + line0
+    # return nextline
+
+
+def get_spacing(line_0, line_1):
+    line_0 = line_0[0:8]
+    timing = re.search(r'\d+', line_0)
 
 
 #                 if len(buffer) == 1 or string[i] == '\n' or int(buffer) > 170 or bool(re.search(r'[a-zA-Z]', string[i+1])):

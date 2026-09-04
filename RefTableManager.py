@@ -117,7 +117,7 @@ def add_referenceRow(new_row):
 
 
 # Cuts reference table into scope x 2 length for faster iteration
-def get_table_slices(estimated_tempo, scope=12):
+def get_table_slices(estimated_tempo, scope=12, override = 0):
     if estimated_tempo < 65:
         estimated_tempo= estimated_tempo * 2
     floor = estimated_tempo - scope

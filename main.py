@@ -236,7 +236,9 @@ def tempo_estimator_screen():
             nextButton()
         elif choice == "5":
             index = input("index:")
-            SystemManager.edit_beat_map(crossEstimate(int(index)), '')
+            crossEstimate(int(index))
+            tempo = input("test at what tempo:")
+            SystemManager.test_tempo(tempo=int(tempo), path=pathList[int(index)])
         elif choice == "0":
             break
 
@@ -321,7 +323,7 @@ if __name__ == "__main__":
     # RefTableManager.create_RTable_from_list()
     # RefTableManager.add_datapoint()
     # Work on this LATER
-    # SystemManager.edit_beat_map(105, "oa")
+    # SystemManager.edit_beat_map(145, "Che - Og Ginobili.mp3")
     # Interface()
 
     # SystemManager.Reorder_data()
@@ -335,7 +337,7 @@ if __name__ == "__main__":
     #
     # (crossEstimate(23))
     #
-    (crossEstimate(11))
+    # crossEstimate(5)
     # # (crossEstimate(15))
     # (crossEstimate(16))
     # print(crossEstimate(20))
@@ -344,11 +346,13 @@ if __name__ == "__main__":
     # for i in range(len(songList)):
     #     crossEstimate(i)
     # (crossEstimate(1))
-    (crossEstimate(14))
+    # (crossEstimate(6))
     # (crossEstimate(-1))
-    getSongList()
+    # getSongList()
 
     # print(TempoEstimator.DTA_Getter(pathList[2]))
+    # SystemManager.test_tempo(tempo=79, path= pathList[0])
+    Interface()
     end = time.time()
 
 

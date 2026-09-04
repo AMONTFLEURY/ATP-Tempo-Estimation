@@ -67,7 +67,7 @@ def rolling_star(t_matrix, e_matrix):
 def slice_correcter(tempos):
     if abs(tempos[0] - tempos[1]) < 3.7 > abs(tempos[1] - tempos[2]):
         return sum(tempos) / len(tempos)
-    elif 142 < tempos[0] < 161:
+    elif 142 < tempos[0] < 167:
         x = min(abs(tempos[0] - 150), abs(tempos[1] - 150), abs(tempos[2] - 150))
         for i in tempos:
             if x == abs(i - 150):
